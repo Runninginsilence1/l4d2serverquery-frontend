@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import { LewButton } from 'lew-ui'
 import axios from 'axios';
 import { LewMessage } from 'lew-ui';
+import cc from 'clipboard';
 
 
 console.log('尝试运行axios获取数据');
@@ -13,7 +14,7 @@ const baseUrl = 'http://121.37.157.126:5000';
 
 const instance = axios.create({
   baseURL: baseUrl,
-  timeout: 1000,
+  timeout: 3000,
   // headers: {'X-Custom-Header': 'foobar'}
 });
 
@@ -72,7 +73,20 @@ const addServerFunc = () => {
   // alert('点击了addServerFunc');
 
   if (newAddress.value !== "") {
+
+    let duServer =  statusDataExample.value.find((server: any) => {
+      return server.address === newAddress.value;
+    })
+
+    if (duServer !== undefined) {
+      DuplicateErrorMessage(duServer.id)
+      newAddress.value = "";
+      return;
+    }
+
     const [hostname, port] = newAddress.value.split(':');
+
+    
 
     instance.post('/serverAdd', {
       host: hostname,
@@ -107,6 +121,28 @@ const DeleteServerFunc = () => {
   }
 }
 
+// 附加操作按钮函数
+
+const DeleteServerInlineFunc = (id: number) => {
+  if (id !== 0) {
+    instance.delete(`/serverDelete/${id}`,)
+      .then(function (response) {
+        // 处理成功情况
+        // statusDataExample.value = response.data;
+        deleteSuccessMessage()
+      })
+      .catch(function (error) {
+        deleteErrorMessage()
+      });
+  }
+}
+
+// 连接服务器
+// v1: 拷贝到剪切板
+// v2: steam://rungame/730/76561202255233023/+connect%20bgp-north.tgpro.top:47045%20-perfectworld
+const ConnectServerFunc = (addr: string) => {
+  cc.copy(`connect ${addr}`)
+}
 
 // input value model
 
@@ -118,6 +154,7 @@ let addDesc = ref('默认服务器描述')
 let deleteID = ref(0)
 
 
+// table data model
 const statusColumns = [
   {
     title: 'ID',
@@ -144,6 +181,15 @@ const statusColumns = [
     title: '玩家数量',
     width: 150,
     field: 'playerRatio',
+  },
+  {
+    type: 'template',
+    title: '执行',
+    field: 'action',
+    width: 150,
+    align: 'center',
+    fixed: 'right',
+    x: 'center'
   }
 ]
 
@@ -218,6 +264,14 @@ const showErrorMessage = () => {
   })
 }
 
+const DuplicateErrorMessage = (id: number) => {
+  LewMessage.error({
+    content: '服务器信息重复!',
+    duration: 3000
+  })
+}
+
+
 
 const deleteSuccessMessage = () => {
   LewMessage.success({
@@ -273,20 +327,34 @@ const deleteErrorMessage = () => {
           <span>{{ row.rating >= 90 ? '优秀' : row.rating >= 80 ? '良好' : '一般' }}</span>
         </lew-flex>
       </template>
+
+      <template #action="{ row, column }">
+      <lew-flex gap="0">
+        <lew-button size="small" text="复制" type="text" @click.stop="ConnectServerFunc(row.address)" />
+        <lew-popok
+          title="删除确认"
+          content="删除之后无法恢复，请确认！"
+          placement="left"
+          width="200px"
+          @click.stop="DeleteServerInlineFunc(row.id)"
+        >
+          <lew-button size="small" text="删除" type="text" />
+        </lew-popok>
+      </lew-flex>
+    </template>
     </lew-table>
   </div>
 
   <div class="add-area">
     <lew-button size="medium" :request="queryServerFunc" text="查询" type="ghost" />
-  
   </div>
 
 
 <div class="op-area">
   <lew-input v-model="newAddress" size="medium" placeholder="输入要添加的服务器地址" clearable />
     <lew-button size="medium" :request="addServerFunc" text="增加" type="ghost" />
-    <lew-input v-model="deleteID" size="medium" placeholder="输入id" clearable />
-    <lew-button size="medium" :request="DeleteServerFunc" text="删除" type="ghost" />
+    <!-- <lew-input v-model="deleteID" size="medium" placeholder="输入id" clearable />
+    <lew-button size="medium" :request="DeleteServerFunc" text="删除" type="ghost" /> -->
 </div>
 
 </template>
