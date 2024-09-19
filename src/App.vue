@@ -7,35 +7,115 @@ import { LewMessage } from 'lew-ui';
 
 console.log('尝试运行axios获取数据');
 
-// const axios = require('axios')
+// 修改远端服务器地址;
+// const baseUrl = 'https://localhost:44316';
+const baseUrl = 'http://121.37.157.126:5000';
 
+const instance = axios.create({
+  baseURL: baseUrl,
+  timeout: 1000,
+  // headers: {'X-Custom-Header': 'foobar'}
+});
 
 let statusDataExample: any = ref([
-  {
-    "address": "60.204.244.191:27015",
-    "serverName": "萌新聚集地 #1 [ZoneMod v2.8.9d Revamped]",
-    "map": "c5m5_bridge",
-    "onlinePlayers": 9,
-    "maxPlayers": 30
-  },
-  {
-    "address": "8.138.80.21:10052",
-    "serverName": "HN 2服 - NepSV Average",
-    "map": "c2m1_highway",
-    "onlinePlayers": 4,
-    "maxPlayers": 12
-  },
   // {
-  //     "address": "218.93.208.65:23361",
-  //     "serverName": "[写专]夏洛克宿迁B1[4特40秒|灭0|路0%]00:16:40",
-  //     "map": "c13m1_alpinecreek",
-  //     "onlinePlayers": 0,
-  //     "maxPlayers": 8
+  //   "address": "218.93.208.65:23361",
+  //   "serverName": "[写专]夏洛克宿迁B1[4特40秒|灭0|路0%]00:16:40",
+  //   "map": "c13m1_alpinecreek",
+  //   "onlinePlayers": 0,
+  //   "maxPlayers": 8
   // }
 ])
 
+// api function definition
+// query: 
+// add: serverAdd
 
+const queryServerFunc = () => {
+  // 向给定ID的用户发起请求
+  instance.get('/serverList')
+    .then(function (response) {
+      // 处理成功情况
+      // console.log(response);
+
+      console.log('成功获取服务器列表数据', response.data);
+
+      statusDataExample.value = response.data;
+
+      const updatedResponse = response.data.map(server => ({
+        ...server,
+        playerRatio: `${server.onlinePlayers}/${server.maxPlayers}`
+      }));
+
+      statusDataExample.value = updatedResponse
+      queryMsgSuccess()
+
+    })
+    .catch(function (error) {
+      // 处理错误情况
+      queryErrorMessage()
+
+      console.log(error);
+    })
+    .finally(function () {
+      console.log('总是会执行');
+
+      // 总是会执行
+    });
+
+}
+
+
+
+const addServerFunc = () => {
+  // console.log('点击了addServerFunc');
+  // alert('点击了addServerFunc');
+
+  if (newAddress.value !== "") {
+    const [hostname, port] = newAddress.value.split(':');
+
+    instance.post('/serverAdd', {
+      host: hostname,
+      port: port,
+      desc: addDesc.value,
+    })
+      .then(function (response) {
+        // 处理成功情况
+        // statusDataExample.value = response.data;
+        showSuccessMessage()
+      })
+      .catch(function (error) {
+        showErrorMessage()
+      });
+  }
+}
+
+const DeleteServerFunc = () => {
+  // console.log('点击了addServerFunc');
+  // alert('点击了addServerFunc');
+
+  if (deleteID.value !== 0) {
+    instance.delete(`/serverDelete/${deleteID.value}`,)
+      .then(function (response) {
+        // 处理成功情况
+        // statusDataExample.value = response.data;
+        deleteSuccessMessage()
+      })
+      .catch(function (error) {
+        deleteErrorMessage()
+      });
+  }
+}
+
+
+// input value model
+
+// add
 let newAddress = ref('')
+let addDesc = ref('默认服务器描述')
+
+// delete
+let deleteID = ref(0)
 
 
 const statusColumns = [
@@ -60,6 +140,11 @@ const statusColumns = [
     width: 150,
     field: 'map',
   },
+  {
+    title: '玩家数量',
+    width: 150,
+    field: 'playerRatio',
+  }
 ]
 
 // const columns = [
@@ -103,30 +188,20 @@ const statusColumns = [
 //   }
 // ]
 
-const getStatusFunc = () => {
-  // 向给定ID的用户发起请求
-  axios.get('https://localhost:44316/serverList')
-    .then(function (response) {
-      // 处理成功情况
-      console.log('ok');
 
-      console.log(response);
+// msg callback
+const queryMsgSuccess = () => {
+  LewMessage.success({
+    content: '查询成功!',
+    duration: 3000
+  })
+}
 
-      statusDataExample.value = response.data;
-    })
-    .catch(function (error) {
-      // 处理错误情况
-      console.log('not ok');
-
-      console.log(error);
-    })
-    .finally(function () {
-      console.log('总是会执行');
-
-      // 总是会执行
-    });
-
-
+const queryErrorMessage = () => {
+  LewMessage.error({
+    content: '查询失败! 请查看控制台输出',
+    duration: 3000
+  })
 }
 
 const showSuccessMessage = () => {
@@ -144,26 +219,20 @@ const showErrorMessage = () => {
 }
 
 
-const addServerFunc = () => {
-  // console.log('点击了addServerFunc');
-  // alert('点击了addServerFunc');
-
-  if (newAddress.value !== "") {
-    axios.post('https://localhost:44316/serverAdd', {
-    host: "8.138.80.21",
-    port: 10052,
-    desc: "默认描述"
-})
-      .then(function (response) {
-        // 处理成功情况
-        // statusDataExample.value = response.data;
-        showSuccessMessage()
-      })
-      .catch(function (error) {
-        showErrorMessage()
-      });
-  }
+const deleteSuccessMessage = () => {
+  LewMessage.success({
+    content: '删除成功!',
+    duration: 3000
+  })
 }
+
+const deleteErrorMessage = () => {
+  LewMessage.error({
+    content: '删除失败!',
+    duration: 3000
+  })
+}
+
 
 
 </script>
@@ -207,12 +276,18 @@ const addServerFunc = () => {
     </lew-table>
   </div>
 
-  <div>
-    <lew-button size="medium" :request="getStatusFunc" text="查询" type="ghost" />
-    <lew-input v-model="newAddress" size="medium" placeholder="输入要添加的服务器地址" clearable />
-    <lew-button size="medium" :request="addServerFunc" text="增加" type="ghost" />
+  <div class="add-area">
+    <lew-button size="medium" :request="queryServerFunc" text="查询" type="ghost" />
+  
   </div>
 
+
+<div class="op-area">
+  <lew-input v-model="newAddress" size="medium" placeholder="输入要添加的服务器地址" clearable />
+    <lew-button size="medium" :request="addServerFunc" text="增加" type="ghost" />
+    <lew-input v-model="deleteID" size="medium" placeholder="输入id" clearable />
+    <lew-button size="medium" :request="DeleteServerFunc" text="删除" type="ghost" />
+</div>
 
 </template>
 
