@@ -5,6 +5,18 @@ import axios from 'axios';
 import { LewMessage } from 'lew-ui';
 import cc from 'clipboard';
 
+// utils function
+
+const splitAddress = (address: string) => {
+  const lastIndex = address.lastIndexOf(':');
+const hostname = address.substring(0, lastIndex);
+const port = address.substring(lastIndex + 1);
+
+return {
+  hostname, port
+}
+}
+
 
 console.log('尝试运行axios获取数据');
 
@@ -74,7 +86,7 @@ const addServerFunc = () => {
 
   if (newAddress.value !== "") {
 
-    let duServer =  statusDataExample.value.find((server: any) => {
+    let duServer = statusDataExample.value.find((server: any) => {
       return server.address === newAddress.value;
     })
 
@@ -84,8 +96,11 @@ const addServerFunc = () => {
       return;
     }
 
-    const [hostname, port] = newAddress.value.split(':');
-
+    // const [hostname, port] = newAddress.value.split(':');
+    const {hostname, port} = splitAddress(newAddress.value);
+    
+    console.log('hostname:', hostname);
+    console.log('port:', port);
     
 
     instance.post('/serverAdd', {
