@@ -9,20 +9,20 @@ import cc from 'clipboard';
 
 const splitAddress = (address: string) => {
   const lastIndex = address.lastIndexOf(':');
-const hostname = address.substring(0, lastIndex);
-const port = address.substring(lastIndex + 1);
+  const hostname = address.substring(0, lastIndex);
+  const port = address.substring(lastIndex + 1);
 
-return {
-  hostname, port
-}
+  return {
+    hostname, port
+  }
 }
 
 
 console.log('尝试运行axios获取数据');
 
 // 修改远端服务器地址;
-// const baseUrl = 'https://localhost:44316';
-const baseUrl = 'http://121.37.157.126:5000';
+const baseUrl = 'https://localhost:44316';
+// const baseUrl = 'http://121.37.157.126:5000';
 
 const instance = axios.create({
   baseURL: baseUrl,
@@ -70,11 +70,11 @@ const queryServerFunc = () => {
 
       console.log(error);
     })
-    .finally(function () {
-      console.log('总是会执行');
+    // .finally(function () {
+    //   console.log('总是会执行');
 
-      // 总是会执行
-    });
+    //   // 总是会执行
+    // });
 
 }
 
@@ -97,11 +97,11 @@ const addServerFunc = () => {
     }
 
     // const [hostname, port] = newAddress.value.split(':');
-    const {hostname, port} = splitAddress(newAddress.value);
-    
+    const { hostname, port } = splitAddress(newAddress.value);
+
     console.log('hostname:', hostname);
     console.log('port:', port);
-    
+
 
     instance.post('/serverAdd', {
       host: hostname,
@@ -286,8 +286,6 @@ const DuplicateErrorMessage = (id: number) => {
   })
 }
 
-
-
 const deleteSuccessMessage = () => {
   LewMessage.success({
     content: '删除成功!',
@@ -303,6 +301,56 @@ const deleteErrorMessage = () => {
 }
 
 
+
+// tag相关
+
+// 查询标签
+const queryAllTagsFunc = () => {
+  instance.get('/serverList')
+    .then(function (response) {
+      // 处理成功情况
+      // console.log(response);
+
+      console.log('成功获取标签的数据', response.data);
+
+      statusDataExample.value = response.data;
+
+      const updatedResponse = response.data.map(server => ({
+        ...server,
+        playerRatio: `${server.onlinePlayers}/${server.maxPlayers}`
+      }));
+
+      statusDataExample.value = updatedResponse
+      queryMsgSuccess()
+
+    })
+    .catch(function (error) {
+      // 处理错误情况
+      queryErrorMessage()
+
+      console.log(error);
+    })
+    .finally(function () {
+      console.log('总是会执行');
+
+      // 总是会执行
+    });
+}
+
+const selectedPlatforms = ref([])
+// 选中了哪些
+// 显示的和值
+const socialMediaOptions = ref([
+  { label: '谷歌', value: 'google' },
+  { label: '苹果', value: 'apple' },
+  { label: '微软', value: 'microsoft' },
+])
+
+// const checkBoxValuePrint = () => {
+//   console.log('当前选中的值', selectedPlatforms.value);
+// }
+
+const ttt = ref('hahaha')
 
 </script>
 
@@ -326,6 +374,18 @@ const deleteErrorMessage = () => {
 </lew-table>
 </div> -->
 
+  <!-- 标签区域 -->
+  <div class="tag">
+    标签信息
+    <lew-button size="small" text="查询标签" type="text" @click.stop="checkBoxValuePrint" />
+
+    <!-- lew-ui 自带一个tag的组件 -->
+    <lew-flex direction="y" :gap="10">
+      <lew-checkbox-group v-model="selectedPlatforms" size="small" :options="socialMediaOptions" />
+    </lew-flex>
+
+  </div>
+
   <div style="height: 380px">
     <lew-table :data-source="statusDataExample" :columns="statusColumns">
       <template #info="{ row }">
@@ -344,19 +404,14 @@ const deleteErrorMessage = () => {
       </template>
 
       <template #action="{ row, column }">
-      <lew-flex gap="0">
-        <lew-button size="small" text="复制" type="text" @click.stop="ConnectServerFunc(row.address)" />
-        <lew-popok
-          title="删除确认"
-          content="删除之后无法恢复，请确认！"
-          placement="left"
-          width="200px"
-          @click.stop="DeleteServerInlineFunc(row.id)"
-        >
-          <lew-button size="small" text="删除" type="text" />
-        </lew-popok>
-      </lew-flex>
-    </template>
+        <lew-flex gap="0">
+          <lew-button size="small" text="复制" type="text" @click.stop="ConnectServerFunc(row.address)" />
+          <lew-popok title="删除确认" content="删除之后无法恢复，请确认！" placement="left" width="200px"
+            @click.stop="DeleteServerInlineFunc(row.id)">
+            <lew-button size="small" text="删除" type="text" />
+          </lew-popok>
+        </lew-flex>
+      </template>
     </lew-table>
   </div>
 
@@ -365,12 +420,12 @@ const deleteErrorMessage = () => {
   </div>
 
 
-<div class="op-area">
-  <lew-input v-model="newAddress" size="medium" placeholder="输入要添加的服务器地址" clearable />
+  <div class="op-area">
+    <lew-input v-model="newAddress" size="medium" placeholder="输入要添加的服务器地址" clearable />
     <lew-button size="medium" :request="addServerFunc" text="增加" type="ghost" />
     <!-- <lew-input v-model="deleteID" size="medium" placeholder="输入id" clearable />
     <lew-button size="medium" :request="DeleteServerFunc" text="删除" type="ghost" /> -->
-</div>
+  </div>
 
 </template>
 
