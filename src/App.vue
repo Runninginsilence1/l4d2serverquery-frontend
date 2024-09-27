@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import TableView from './views/TableView.vue';
+import AddServerView from './views/AddServerView.vue';
 import { ref } from 'vue';
 import { LewButton } from 'lew-ui'
 import axios from 'axios';
@@ -355,29 +357,12 @@ const ttt = ref('hahaha')
 </script>
 
 <template>
-  <!-- <div style="height: 380px">
-    <lew-table :data-source="data" :columns="columns">
-      <template #info="{ row }">
-        <lew-flex direction="y" x="start" gap="0px" class="info">
-          <div class="name">{{ row.name }}</div>
-          <div class="brand">{{ row.brand }}</div>
-        </lew-flex>
-      </template>
-<template #rating="{ row }">
-        <lew-flex>
-          <lew-badge v-if="row.rating >= 90" round color="green" />
-          <lew-badge v-else-if="row.rating >= 80" round color="blue" />
-          <lew-badge v-else round color="orange" />
-          <span>{{ row.rating >= 90 ? '优秀' : row.rating >= 80 ? '良好' : '一般' }}</span>
-        </lew-flex>
-      </template>
-</lew-table>
-</div> -->
+  
 
   <!-- 标签区域 -->
   <div class="tag">
     标签信息
-    <lew-button size="small" text="查询标签" type="text" @click.stop="checkBoxValuePrint" />
+    <!-- <lew-button size="small" text="查询标签" type="text" @click.stop="checkBoxValuePrint" /> -->
 
     <!-- lew-ui 自带一个tag的组件 -->
     <lew-flex direction="y" :gap="10">
@@ -386,39 +371,10 @@ const ttt = ref('hahaha')
 
   </div>
 
-  <div style="height: 380px">
-    <lew-table :data-source="statusDataExample" :columns="statusColumns">
-      <template #info="{ row }">
-        <lew-flex direction="y" x="start" gap="0px" class="info">
-          <div class="name">{{ row.name }}</div>
-          <div class="brand">{{ row.brand }}</div>
-        </lew-flex>
-      </template>
-      <template #rating="{ row }">
-        <lew-flex>
-          <lew-badge v-if="row.rating >= 90" round color="green" />
-          <lew-badge v-else-if="row.rating >= 80" round color="blue" />
-          <lew-badge v-else round color="orange" />
-          <span>{{ row.rating >= 90 ? '优秀' : row.rating >= 80 ? '良好' : '一般' }}</span>
-        </lew-flex>
-      </template>
+  <TableView/>
 
-      <template #action="{ row, column }">
-        <lew-flex gap="0">
-          <lew-button size="small" text="复制" type="text" @click.stop="ConnectServerFunc(row.address)" />
-          <lew-popok title="删除确认" content="删除之后无法恢复，请确认！" placement="left" width="200px"
-            @click.stop="DeleteServerInlineFunc(row.id)">
-            <lew-button size="small" text="删除" type="text" />
-          </lew-popok>
-        </lew-flex>
-      </template>
-    </lew-table>
-  </div>
-
-  <div class="add-area">
-    <lew-button size="medium" :request="queryServerFunc" text="查询" type="ghost" />
-  </div>
-
+  <AddServerView/>
+  
 
   <div class="op-area">
     <lew-input v-model="newAddress" size="medium" placeholder="输入要添加的服务器地址" clearable />
