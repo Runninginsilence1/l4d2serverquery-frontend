@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
-import { LewButton } from 'lew-ui'
+import {ref} from 'vue';
+import {LewButton, LewMessage} from 'lew-ui'
 import axios from 'axios';
-import { LewMessage } from 'lew-ui';
 import cc from 'clipboard';
+import myrequest from '@/utils/request';
 
 const splitAddress = (address: string) => {
   const lastIndex = address.lastIndexOf(':');
@@ -15,30 +15,14 @@ const splitAddress = (address: string) => {
   }
 }
 
-
-// 修改远端服务器地址;
-// const baseUrl = 'https://localhost:44316';
-const baseUrl = 'http://121.37.157.126:5000';
-
-const instance = axios.create({
-  baseURL: baseUrl,
-  timeout: 3000,
-  // headers: {'X-Custom-Header': 'foobar'}
-});
-
 let statusDataExample: any = ref([
-  // {
-  //   "address": "218.93.208.65:23361",
-  //   "serverName": "[写专]夏洛克宿迁B1[4特40秒|灭0|路0%]00:16:40",
-  //   "map": "c13m1_alpinecreek",
-  //   "onlinePlayers": 0,
-  //   "maxPlayers": 8
-  // }
+  
 ])
 
 const queryServerFunc = () => {
   // 向给定ID的用户发起请求
-  instance.get('/serverList')
+  // instance.get('/serverList')
+  myrequest.get('/serverList')
     .then(function (response) {
       // 处理成功情况
       // console.log(response);
@@ -47,28 +31,19 @@ const queryServerFunc = () => {
 
       statusDataExample.value = response.data;
 
-      const updatedResponse = response.data.map(server => ({
+      statusDataExample.value = response.data.map(server => ({
         ...server,
         playerRatio: `${server.onlinePlayers}/${server.maxPlayers}`
-      }));
-
-      statusDataExample.value = updatedResponse
+      }))
       queryMsgSuccess()
 
     })
     .catch(function (error) {
       // 处理错误情况
+      console.log('调用查询接口失败');
+      console.log(error);      
       queryErrorMessage()
-
-      console.log(error);
     })
-    .finally(function () {
-      console.log('总是会执行');
-      console.log(instance.getUri());
-      
-
-      // 总是会执行
-    });
 
 }
 
@@ -129,6 +104,11 @@ const statusColumns = [
     field: 'playerRatio',
   },
   {
+    title: '最后复制时间',
+    width: 150,
+    field: 'lastQueryTimeString',
+  },
+  {
     type: 'template',
     title: '执行',
     field: 'action',
@@ -139,13 +119,28 @@ const statusColumns = [
   }
 ]
 
-const ConnectServerFunc = (addr: string) => {
+const ConnectServerFunc = (id: number,addr: string) => {
   cc.copy(`connect ${addr}`)
+  myrequest.get(`/lastCopyTimeUpdate/${id}`)
+    .then(function (response) {
+    LewMessage.success({
+    content: '更新服务器时间成功!',
+    duration: 3000
+  })
+    })
+    .catch(function (error) {
+      LewMessage.error({
+    content: '访问接口失败!',
+    duration: 3000
+  })
+  console.log('访问接口失败');
+      console.log(error);
+    })
 }
 
 const DeleteServerInlineFunc = (id: number) => {
   if (id !== 0) {
-    instance.delete(`/serverDelete/${id}`,)
+    myrequest.delete(`/serverDelete/${id}`,)
       .then(function (response) {
         // 处理成功情况
         // statusDataExample.value = response.data;
@@ -199,7 +194,7 @@ const deleteErrorMessage = () => {
 
       <template #action="{ row, column }">
         <lew-flex gap="0">
-          <lew-button size="small" text="复制" type="text" @click.stop="ConnectServerFunc(row.address)" />
+          <lew-button size="small" text="复制" type="text" @click.stop="ConnectServerFunc(row.id, row.address)" />
           <lew-popok title="删除确认" content="删除之后无法恢复，请确认！" placement="left" width="200px"
             @click.stop="DeleteServerInlineFunc(row.id)">
             <lew-button size="small" text="删除" type="text" />
