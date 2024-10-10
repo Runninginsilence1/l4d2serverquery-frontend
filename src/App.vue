@@ -14,30 +14,40 @@ import cc from 'clipboard';
 <template>
 
 
-  <TagView />
+  <!-- <TagView /> -->
+   <div class="tag">
+    <TagView />
+   </div>
+   <div class="table">
+    <TableView />
+   </div>
+   <div class="add">
+    <AddServerView />
+   </div>
 
 
-  <TableView />
+  
 
 
-  <AddServerView />
+  
 </template>
 
 <style lang="scss" scoped>
-.info {
-  line-height: 22px;
 
-  .name {
-    font-weight: bold;
-  }
+.tag {
+  border-style: groove;
+  border-color: greenyellow;
+}
 
-  .brand {
-    width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-size: 12px;
-    white-space: nowrap;
-    color: var(--lew-text-color-7);
-  }
+.table {
+  margin-top: 10vh;
+  border-style: groove;
+  border-color: aqua;
+}
+
+.add {
+  margin-top: 10vh;
+  border-style: groove;
+  border-color: red;
 }
 </style>

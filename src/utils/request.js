@@ -6,7 +6,7 @@ const baseUrl = 'https://localhost:44316';
 const myrequest = axios.create({
     baseURL: baseUrl,
     timeout: 5000,
-    // headers: {'X-Custom-Header': 'foobar'}
+    // headers: {'X-Custom-Header': 'foobar'} // 自定义请求头
 });
 
 

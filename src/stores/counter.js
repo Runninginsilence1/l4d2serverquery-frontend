@@ -10,3 +10,14 @@ export const useCounterStore = defineStore('counter', () => {
 
   return { count, doubleCount, increment }
 })
+
+// 用于在 tag和table中传递选择的tag列表
+export const useTagListStore = defineStore('tagList', () => {
+  const tagList = ref([])
+  const getTagList = computed(() => tagList.value)
+  const updateTagList = (newTagList) => {
+    tagList.value = newTagList
+  }
+
+  return { tagList, getTagList, updateTagList }
+})

@@ -4,6 +4,7 @@ import {LewButton, LewMessage} from 'lew-ui'
 import axios from 'axios';
 import cc from 'clipboard';
 import myrequest from '@/utils/request';
+import { useTagListStore } from '@/stores/counter';
 
 const splitAddress = (address: string) => {
   const lastIndex = address.lastIndexOf(':');
@@ -23,6 +24,40 @@ const queryServerFunc = () => {
   // 向给定ID的用户发起请求
   // instance.get('/serverList')
   myrequest.get('/serverList')
+    .then(function (response) {
+      // 处理成功情况
+      // console.log(response);
+
+      console.log('成功获取服务器列表数据', response.data);
+
+      statusDataExample.value = response.data;
+
+      statusDataExample.value = response.data.map(server => ({
+        ...server,
+        playerRatio: `${server.onlinePlayers}/${server.maxPlayers}`
+      }))
+      queryMsgSuccess()
+
+    })
+    .catch(function (error) {
+      // 处理错误情况
+      console.log('调用查询接口失败');
+      console.log(error);      
+      queryErrorMessage()
+    })
+
+}
+
+// 带上了 tag
+const queryServerFuncV2 = () => {
+  // 向给定ID的用户发起请求
+  // instance.get('/serverList')
+
+  const store = useTagListStore();
+
+  myrequest.post('/serverList/v2', {
+    tags: store.getTagList
+  })
     .then(function (response) {
       // 处理成功情况
       // console.log(response);
@@ -172,7 +207,7 @@ const deleteErrorMessage = () => {
 <template>
 
 <div class="add-area">
-    <lew-button size="medium" :request="queryServerFunc" text="查询" type="ghost" />
+    <lew-button size="medium" :request="queryServerFuncV2" text="查询" type="ghost" />
   </div>
 
 <div style="height: 380px">
