@@ -62,6 +62,20 @@ const getAllTags = () => {
       console.log(err)
     })
   }
+
+// 更新关系
+const fixReleation = () => {
+  myrequest.get('/debug/fixtag')
+  .then(res => {
+    showOkMessage('更新成功')
+  }
+    )
+    .catch(err => {
+      showFailMessage('更新失败')
+      console.log(err)
+    })
+  }
+
   
 // 发送选中的tag
 const sendTags = () => {
@@ -88,7 +102,7 @@ onMounted(() => {
       <lew-checkbox-group v-model="selectedPlatforms" size="small" :options="tagOptions" />
     </lew-flex>
 
-    <!-- <lew-button size="medium" :request="getAllTags" text="查询" type="ghost" /> -->
+    <lew-button size="medium" :request="fixReleation" text="服务器分类" type="ghost" />
 
   </div>
 

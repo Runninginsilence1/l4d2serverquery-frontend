@@ -5,6 +5,8 @@ import axios from 'axios';
 import { LewMessage } from 'lew-ui';
 import cc from 'clipboard';
 
+const dialogVisible = ref(true);
+
 const splitAddress = (address: string) => {
   const lastIndex = address.lastIndexOf(':');
   const hostname = address.substring(0, lastIndex);
@@ -14,7 +16,6 @@ const splitAddress = (address: string) => {
     hostname, port
   }
 }
-
 
 // 修改远端服务器地址;
 // const baseUrl = 'https://localhost:44316';
@@ -61,13 +62,6 @@ const queryServerFunc = () => {
       queryErrorMessage()
 
       console.log(error);
-    })
-    .finally(function () {
-      console.log('总是会执行');
-      console.log(instance.getUri());
-      
-
-      // 总是会执行
     });
 
 }
@@ -227,9 +221,10 @@ const addServerFunc = () => {
 
 <div class="op-area">
     <lew-input v-model="newAddress" size="medium" placeholder="输入要添加的服务器地址" clearable />
-    <lew-button size="medium" :request="addServerFunc" text="增加" type="ghost" />
-    <!-- <lew-input v-model="deleteID" size="medium" placeholder="输入id" clearable />
-    <lew-button size="medium" :request="DeleteServerFunc" text="删除" type="ghost" /> -->
+    <lew-button size="medium" :request="addServerFunc" text="添加服务器!" type="ghost" />
+
+    
+    
   </div>
 
 </template>

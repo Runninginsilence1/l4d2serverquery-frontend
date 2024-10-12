@@ -201,6 +201,12 @@ const deleteErrorMessage = () => {
   })
 }
 
+const popokOk = () => {
+
+}
+
+const popokCancel = () => {}
+
 
 </script>
 
@@ -229,11 +235,9 @@ const deleteErrorMessage = () => {
 
       <template #action="{ row, column }">
         <lew-flex gap="0">
+          <!-- 不知道为什么在这里把删除调用了两次 -->
           <lew-button size="small" text="复制" type="text" @click.stop="ConnectServerFunc(row.id, row.address)" />
-          <lew-popok title="删除确认" content="删除之后无法恢复，请确认！" placement="left" width="200px"
-            @click.stop="DeleteServerInlineFunc(row.id)">
-            <lew-button size="small" text="删除" type="text" />
-          </lew-popok>
+            <lew-button size="small" text="删除" type="text" @click.stop="DeleteServerInlineFunc(row.id)" />
         </lew-flex>
       </template>
     </lew-table>

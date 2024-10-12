@@ -35,19 +35,19 @@ import cc from 'clipboard';
 <style lang="scss" scoped>
 
 .tag {
-  border-style: groove;
-  border-color: greenyellow;
+  // border-style: groove;
+  // border-color: greenyellow;
 }
 
 .table {
   margin-top: 10vh;
-  border-style: groove;
-  border-color: aqua;
+  // border-style: groove;
+  // border-color: aqua;
 }
 
 .add {
   margin-top: 10vh;
-  border-style: groove;
-  border-color: red;
+  // border-style: groove;
+  // border-color: red;
 }
 </style>
