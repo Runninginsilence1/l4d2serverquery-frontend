@@ -7,6 +7,7 @@ import { LewButton } from 'lew-ui'
 import axios from 'axios';
 import { LewMessage } from 'lew-ui';
 import cc from 'clipboard';
+import TestView from "@/views/TestView.vue";
 
 
 </script>
@@ -16,6 +17,7 @@ import cc from 'clipboard';
 
   <!-- <TagView /> -->
    <div class="tag">
+     <TestView />
     <TagView />
    </div>
    <div class="table">
@@ -40,9 +42,9 @@ import cc from 'clipboard';
 }
 
 .table {
-  margin-top: 10vh;
+  //margin-top: 10vh;
   // border-style: groove;
-  // border-color: aqua;
+  // border: aqua 1px solid;
 }
 
 .add {

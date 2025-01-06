@@ -1,6 +1,13 @@
 # l4d2
 
-This template should help get you started developing with Vue 3 in Vite.
+## 代码索引
+- html服务器信息表格最后时间
+- 数据列 // 最后5分钟如果复制过则警告，yellow
+- 点击复制 const ConnectServerFunc = (id: number, addr: string) => \{
+
+
+
+
 
 ## 进入到指定位置
 cd C:\zzk\code\vscode\l4d2

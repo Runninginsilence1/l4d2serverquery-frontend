@@ -4,6 +4,7 @@ import { LewButton } from 'lew-ui'
 import axios from 'axios';
 import { LewMessage } from 'lew-ui';
 import cc from 'clipboard';
+import myrequest from '@/utils/request';
 
 const dialogVisible = ref(true);
 
@@ -199,9 +200,16 @@ const addServerFunc = () => {
     console.log('port:', port);
 
 
-    instance.post('/serverAdd', {
-      host: hostname,
-      port: port,
+    // 现在推测是因为前端这里的传递的参数没有带上那个谁
+
+    // old:
+    // myrequest.post('/servers/add', {
+    //   host: hostname,
+    //   port: port,
+    //   desc: addDesc.value,
+    // })
+    myrequest.post('/servers/add', {
+      addr: newAddress.value,
       desc: addDesc.value,
     })
       .then(function (response) {
@@ -215,6 +223,16 @@ const addServerFunc = () => {
   }
 }
 
+import type { UploadFileItem } from 'lew-ui'
+import uploadhelper from '@/utils/uploadhelper';
+import { watch } from 'vue';
+
+const fileList = ref<UploadFileItem[]>([])
+
+watch(fileList, (newVal, oldVal) => {
+  console.log('fileList changed:', newVal, oldVal);
+})
+
 </script>
 
 <template>
@@ -222,9 +240,11 @@ const addServerFunc = () => {
 <div class="op-area">
     <lew-input v-model="newAddress" size="medium" placeholder="输入要添加的服务器地址" clearable />
     <lew-button size="medium" :request="addServerFunc" text="添加服务器!" type="ghost" />
-
-    
-    
+    <lew-flex width="400px">
+    <lew-upload v-model="fileList" :uploadHelper="uploadhelper" />
+    <!-- 点击上传立刻执行 uploadhelper 中的函数  -->
+     <!--  -->
+  </lew-flex>
   </div>
 
 </template>

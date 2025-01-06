@@ -1,7 +1,7 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 
-export const useCounterStore = defineStore('counter', () => {
+export const useCounterStore = defineStore('configStore', () => {
   const count = ref(0)
   const doubleCount = computed(() => count.value * 2)
   function increment() {
@@ -21,3 +21,5 @@ export const useTagListStore = defineStore('tagList', () => {
 
   return { tagList, getTagList, updateTagList }
 })
+
+

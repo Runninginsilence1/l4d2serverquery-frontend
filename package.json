@@ -4,13 +4,15 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
+    "dev": "vite --mode dev",
+    "build": "vite build --mode pro",
     "preview": "vite preview"
   },
   "dependencies": {
+    "ant-design-vue": "~4.2.6",
     "axios": "^1.7.7",
     "clipboard": "^2.0.11",
+    "element-plus": "^2.8.6",
     "lew-ui": "^2.3.10",
     "pinia": "^2.1.7",
     "vue": "^3.4.29",
