@@ -225,11 +225,7 @@ watch(fileList, (newVal, oldVal) => {
 <div class="op-area">
     <lew-input v-model="newAddress" size="medium" placeholder="输入要添加的服务器地址" clearable />
     <lew-button size="medium" :request="addServerFunc" text="添加服务器!" type="ghost" />
-    <lew-flex width="400px">
-    <lew-upload v-model="fileList" :uploadHelper="uploadhelper" />
-    <!-- 点击上传立刻执行 uploadhelper 中的函数  -->
-     <!--  -->
-  </lew-flex>
+    
   </div>
 
 </template>

@@ -131,34 +131,14 @@ const handleMenuClick: MenuProps['onClick'] = e => {
 
     <h1 class="text-3xl font-bold underline">测试</h1>
 
-    <lew-button class="underline" size="medium" :request="groupbyserverandtag" text="服务器分类" type="ghost" />
-    <div>
+    <a-flex gap="middle" vertical>
+      <a-flex :gap="15">
+      <lew-button class="underline" size="medium" :request="groupbyserverandtag" text="服务器分类" type="ghost" />
       <lew-button size="medium" :request="deleteInvalidServer" text="删除服务器" type="ghost" />
-    </div>
+    </a-flex>
+    </a-flex>
 
-    <div class="demo-dropdown-wrap">
-      <a-dropdown-button @click="handleButtonClick">
-        下拉框
-        <template #overlay>
-          <a-menu @click="handleMenuClick">
-            <a-menu-item key="1">
-              <UserOutlined />
-              1st menu item
-            </a-menu-item>
-            <a-menu-item key="2">
-              <UserOutlined />
-              2nd menu item
-            </a-menu-item>
-            <a-menu-item key="3">
-              <UserOutlined />
-              3rd item
-            </a-menu-item>
-          </a-menu>
-        </template>
-      </a-dropdown-button>
-
-
-    </div>
+  
 
   </div>
 

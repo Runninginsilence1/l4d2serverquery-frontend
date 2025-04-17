@@ -14,20 +14,28 @@ import TestView from "@/views/TestView.vue";
 
 <template>
 
+<!--  -->
 
-  <!-- 标签和一些启动测试用的东西 -->
+
   <div class="tag">
     <TestView />
     <TagView />
   </div>
   <!-- 用来展示信息的表格 -->
+
   <div class="table">
     <TableView />
   </div>
-  <!-- 添加服务器的地方 -->
+
   <div class="add">
     <AddServerView />
   </div>
+
+
+  <!-- 标签和一些启动测试用的东西 -->
+  
+  <!-- 添加服务器的地方 -->
+  
 </template>
 
 <style lang="scss" scoped>
