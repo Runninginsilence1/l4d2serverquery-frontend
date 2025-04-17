@@ -1,27 +1,19 @@
 <script lang="ts" setup>
 import {ref} from 'vue';
-import {LewButton, LewMessage} from 'lew-ui'
+import {LewButton, LewFlex, LewMessage, LewTable} from 'lew-ui'
 import axios from 'axios';
 import cc from 'clipboard';
 import myrequest from '@/utils/request';
 import {useTagListStore} from '@/stores/counter';
 import {ElDialog} from "element-plus";
+import TagComponent from '@/components/TagComponent.vue'
 
-const splitAddress = (address: string) => {
-  const lastIndex = address.lastIndexOf(':');
-  const hostname = address.substring(0, lastIndex);
-  const port = address.substring(lastIndex + 1);
-
-  return {
-    hostname, port
-  }
-}
 
 // Example data
 // 提醒一句：chrome可以直接复制响应json中的数据成josn， 非常方便
 
 let statusDataExample: any = ref([
-{
+  {
     "id": 24,
     "address": "106.54.61.52:25444",
     "serverName": "Fake Data",
@@ -29,42 +21,14 @@ let statusDataExample: any = ref([
     "onlinePlayers": 8,
     "maxPlayers": 12,
     "lastQueryTimeString": "2024-11-17 15:58:27"
-}
+  }
 ])
 
-const queryServerFunc = () => {
-  // 向给定ID的用户发起请求
-  // instance.get('/serverList')
-  myrequest.get('/serverList')
-      .then(function (response) {
-        // 处理成功情况
-        // console.log(response);
 
-        console.log('成功获取服务器列表数据', response.data);
-
-        statusDataExample.value = response.data;
-
-        statusDataExample.value = response.data.map(server => ({
-          ...server,
-          playerRatio: `${server.onlinePlayers}/${server.maxPlayers}`
-        }))
-        queryMsgSuccess()
-
-      })
-      .catch(function (error) {
-        // 处理错误情况
-        console.log('调用查询接口失败');
-        console.log(error);
-        queryErrorMessage()
-      })
-
-}
-
-const dialogVisible = ref(false)
+const playerDialogVisible = ref(false)
+const tagDialogVisible = ref(false)
 
 const playersData: any = ref([])
-
-
 
 
 const QueryPlayerFunc = (id: number, addr: string) => {
@@ -72,18 +36,15 @@ const QueryPlayerFunc = (id: number, addr: string) => {
     addr: addr
   }).then((res) => {
     playersData.value = res.data;
-
-    dialogVisible.value = true;
+    playerDialogVisible.value = true;
   }).catch(function (error) {
     LewMessage.error({
-      content: '访问接口失败!',
+      content: '查询失败! 请查看控制台输出',
       duration: 3000
     })
-    console.log('访问接口失败');
-    console.log(error);
+    console.error(error.response.data)
   })
 }
-
 
 
 const RefreshServerFunc = (id: number) => {
@@ -102,10 +63,6 @@ const RefreshServerFunc = (id: number) => {
   })
 }
 
-const TestIndexFunc = (row: any, column: any) => {
-  let index = statusDataExample.value.findIndex((item) => item.id == row.id)
-  console.log(`id: ${row.id}, index: ${index}`)
-}
 
 // 带上了 tag
 const queryServerFuncV2 = () => {
@@ -118,12 +75,7 @@ const queryServerFuncV2 = () => {
     tags: store.getTagList
   })
       .then(function (response) {
-        // 处理成功情况
-        // console.log(response);
-
-        console.log('成功获取服务器列表数据', response.data);
-
-        statusDataExample.value = response.data;
+        // console.log('成功获取服务器列表数据', response.data);
 
         statusDataExample.value = response.data.map(server => ({
           ...server,
@@ -133,10 +85,9 @@ const queryServerFuncV2 = () => {
 
       })
       .catch(function (error) {
-        // 处理错误情况
-        console.log('调用查询接口失败');
-        console.log(error);
         queryErrorMessage()
+        // console.error(error.response);
+        console.error(error);
       })
 
 }
@@ -156,26 +107,13 @@ const queryErrorMessage = () => {
   })
 }
 
-const showSuccessMessage = () => {
-  LewMessage.success({
-    content: '添加成功!',
-    duration: 3000
-  })
-}
-
-const showErrorMessage = () => {
-  LewMessage.error({
-    content: '添加失败!',
-    duration: 3000
-  })
-}
 
 const statusColumns = [
   // {
-    //title: 'ID',
-    // field: 'id',
-    // width: 60,
-    // x: 'center'
+  //title: 'ID',
+  // field: 'id',
+  // width: 60,
+  // x: 'center'
   // },
   {
     title: '服务器地址',
@@ -219,69 +157,42 @@ const statusColumns = [
 ]
 
 
-const statusRender = (timeStr: string): boolean =>  {
+const statusRender = (timeStr: string): boolean => {
   // 解析字符串时间
   const time = new Date(timeStr);
 
-// 获取当前时间
-const now = new Date();
+  // 获取当前时间
+  const now = new Date();
 
-// 计算时间差（以毫秒为单位）
-const timeDiff = now.getTime() - time.getTime();
+  // 计算时间差（以毫秒为单位）
+  const timeDiff = now.getTime() - time.getTime();
 
-// 将时间差转换为分钟
-const timeDiffInMinutes = timeDiff / (1000 * 60);
+  // 将时间差转换为分钟
+  const timeDiffInMinutes = timeDiff / (1000 * 60);
 
-// 判断时间差是否在5分钟以内
-return timeDiffInMinutes <= 5;
+  // 判断时间差是否在5分钟以内
+  return timeDiffInMinutes <= 5;
 }
-
-function formatTimeInterval(timeStr: string): string {
-    // 解析时间字符串为Date对象
-    const pastTime = new Date(timeStr);
-    // 获取当前时间
-    const now = new Date();
-    // 计算时间差（以毫秒为单位）
-    const timeDiff = now.getTime() - pastTime.getTime();
-
-    // 计算天、小时、分钟和秒
-    const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
-
-    // 根据时间差返回不同的字符串
-    if (days > 0) {
-        return `距离上次复制 ${days}天`;
-    } else if (hours > 0) {
-        return `距离上次复制 ${hours}小时`;
-    } else if (minutes > 0) {
-        return `距离上次复制 ${minutes}分钟`;
-    } else {
-        return `距离上次复制 ${seconds}秒`;
-    }
-}
-
 
 
 function getCurrentTimeFormatted(): string {
-    const now = new Date();
-    return now.toLocaleString('zh-CN', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false // 24小时制
-    }).replace(/\//g, '-').replace(',', '');
+  const now = new Date();
+  return now.toLocaleString('zh-CN', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false // 24小时制
+  }).replace(/\//g, '-').replace(',', '');
 }
 
 
 const ConnectServerFunc = (id: number, addr: string) => {
   cc.copy(`connect ${addr}`)
   myrequest.get(`/lastCopyTimeUpdate/${id}`)
-      .then(function (response) {
+      .then(function () {
         LewMessage.success({
           content: '更新服务器时间成功!',
           duration: 3000
@@ -289,25 +200,25 @@ const ConnectServerFunc = (id: number, addr: string) => {
       })
       .catch(function (error) {
         LewMessage.error({
-          content: '访问接口失败!',
+          content: '更新服务器时间失败!',
           duration: 3000
         })
-        console.log('访问接口失败');
+        console.log('更新服务器时间失败');
         console.log(error);
       })
-      let index = statusDataExample.value.findIndex((item) => item.id == id)
-      statusDataExample.value[index].lastQueryTimeString = getCurrentTimeFormatted()
+  let index = statusDataExample.value.findIndex((item) => item.id == id)
+  statusDataExample.value[index].lastQueryTimeString = getCurrentTimeFormatted()
 }
 
 const DeleteServerInlineFunc = (id: number) => {
   if (id !== 0) {
     myrequest.delete(`/serverDelete/${id}`,)
-        .then(function (response) {
+        .then(function () {
           // 处理成功情况
           // statusDataExample.value = response.data;
           deleteSuccessMessage()
         })
-        .catch(function (error) {
+        .catch(function () {
           deleteErrorMessage()
         });
   }
@@ -327,9 +238,6 @@ const deleteErrorMessage = () => {
   })
 }
 
-const popokOk = () => {
-
-}
 
 const popokCancel = () => {
 }
@@ -343,7 +251,12 @@ const popokCancel = () => {
     <lew-button size="medium" :request="queryServerFuncV2" text="查询" type="ghost"/>
   </div>
 
-  <el-dialog v-model="dialogVisible" title="玩家详情" width="800">
+  <el-dialog v-model="tagDialogVisible" title="标签管理" width="800">
+    <TagComponent/>
+  </el-dialog>
+
+  <!-- el-dialog位置 -->
+  <el-dialog v-model="playerDialogVisible" title="玩家信息" width="800">
     <el-table :data="playersData">
       <el-table-column property="id" label="ID" width="150"/>
       <el-table-column property="name" label="名称" width="200"/>
@@ -355,17 +268,17 @@ const popokCancel = () => {
   <div class="table-area" style="height: 680px">
     <lew-table :data-source="statusDataExample" :columns="statusColumns">
 
-      <template #status="{ row, column }">
+      <template #status="{ row }">
         <lew-flex gap="0">
           <!-- 判断是否 -->
-          <lew-tag v-if="statusRender(row.lastQueryTimeString)" type="fill" color="yellow">距离上次连接不足5分钟</lew-tag>
+          <lew-tag v-if="statusRender(row.lastQueryTimeString)" type="fill" color="yellow">距离上次连接不足5分钟
+          </lew-tag>
           <lew-tag v-else type="fill" color="green">推荐连接</lew-tag>
         </lew-flex>
-      </template>      
+      </template>
 
-      <template #action="{ row, column }">
+      <template #action="{ row }">
         <lew-flex gap="0">
-          <!-- 不知道为什么在这里把删除调用了两次 -->
           <lew-button size="small" text="复制" type="text" @click.stop="ConnectServerFunc(row.id, row.address)"/>
           <lew-button size="small" text="玩家" type="text" @click.stop="QueryPlayerFunc(row.id, row.address)"/>
           <lew-button size="small" text="刷新" type="text" @click.stop="RefreshServerFunc(row.id)"/>

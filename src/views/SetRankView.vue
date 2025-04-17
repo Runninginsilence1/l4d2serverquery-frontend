@@ -42,19 +42,29 @@ const queryServerFunc = () => {
   // 向给定ID的用户发起请求
   instance.get('/serverList')
     .then(function (response) {
+      // 处理成功情况
+      // console.log(response);
+
       console.log('成功获取服务器列表数据', response.data);
-      statusDataExample.value = response;
+
+      statusDataExample.value = response.data;
+
       const updatedResponse = response.data.map(server => ({
         ...server,
         playerRatio: `${server.onlinePlayers}/${server.maxPlayers}`
       }));
+
       statusDataExample.value = updatedResponse
       queryMsgSuccess()
+
     })
     .catch(function (error) {
-      queryErrorMessage();
+      // 处理错误情况
+      queryErrorMessage()
+
       console.log(error);
     });
+
 }
 
 // msg callback
@@ -152,7 +162,7 @@ const deleteErrorMessage = () => {
 }
 
 // add
-let newAddress = ref('')
+let rankNumber = ref('')
 let addDesc = ref('默认服务器描述')
 
 const DuplicateErrorMessage = (id: number) => {
@@ -162,24 +172,24 @@ const DuplicateErrorMessage = (id: number) => {
   })
 }
 
-const addServerFunc = () => {
+const apiFunc = () => {
   // console.log('点击了addServerFunc');
   // alert('点击了addServerFunc');
 
-  if (newAddress.value !== "") {
+  if (rankNumber.value !== "") {
 
     let duServer = statusDataExample.value.find((server: any) => {
-      return server.address === newAddress.value;
+      return server.address === rankNumber.value;
     })
 
     if (duServer !== undefined) {
       DuplicateErrorMessage(duServer.id)
-      newAddress.value = "";
+      rankNumber.value = "";
       return;
     }
 
     // const [hostname, port] = newAddress.value.split(':');
-    const { hostname, port } = splitAddress(newAddress.value);
+    const { hostname, port } = splitAddress(rankNumber.value);
 
     console.log('hostname:', hostname);
     console.log('port:', port);
@@ -194,7 +204,7 @@ const addServerFunc = () => {
     //   desc: addDesc.value,
     // })
     myrequest.post('/servers/add', {
-      addr: newAddress.value,
+      addr: rankNumber.value,
       desc: addDesc.value,
     })
       .then(function (response) {
@@ -208,28 +218,16 @@ const addServerFunc = () => {
   }
 }
 
-import type { UploadFileItem } from 'lew-ui'
-import uploadhelper from '@/utils/uploadhelper';
-import { watch } from 'vue';
-
-const fileList = ref<UploadFileItem[]>([])
-
-watch(fileList, (newVal, oldVal) => {
-  console.log('fileList changed:', newVal, oldVal);
-})
-
 </script>
 
 <template>
 
 <div class="op-area">
-    <lew-input v-model="newAddress" size="medium" placeholder="输入要添加的服务器地址" clearable />
-    <lew-button size="medium" :request="addServerFunc" text="添加服务器!" type="ghost" />
-    <lew-flex width="400px">
-    <lew-upload v-model="fileList" :uploadHelper="uploadhelper" />
-    <!-- 点击上传立刻执行 uploadhelper 中的函数  -->
-     <!--  -->
-  </lew-flex>
+    <lew-input v-model="rankNumber" size="medium" placeholder="输入你的排名号?" clearable />
+    <lew-button size="medium" :request="apiFunc" text="修改!" type="ghost" />
+
+    
+    
   </div>
 
 </template>

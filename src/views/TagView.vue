@@ -10,7 +10,7 @@ import { useCounterStore, useTagListStore } from '@/stores/counter';
 
 
 
-const selectedPlatforms = ref([])
+const selectedTags = ref([])
 // 选中了哪些
 // 显示的和值
 const tagOptions = ref([
@@ -34,9 +34,7 @@ const showFailMessage = (message: string) => {
   })
 }
 
-
-
-watch(selectedPlatforms, (newVal, oldVal) => {
+watch(selectedTags, (newVal, oldVal) => {
   const store = useTagListStore()
   store.updateTagList(newVal)
 })
@@ -94,7 +92,7 @@ const groupbyserverandtag = () => {
 // 发送选中的tag
 const sendTags = () => {
   myrequest.post('/sendTags', {
-    tags: selectedPlatforms.value
+    tags: selectedTags.value
   })
 }
 
@@ -103,17 +101,11 @@ onMounted(() => {
   getAllTags();
 })
 
-const options = ref([
-  { label: '标准配送', value: 'standard' },
-  { label: '快速配送', value: 'express' },
-  { label: '次日达', value: 'nextDay' },
-  { label: '同城急送', value: 'sameDay' }
-])
 
 const selectedShipping = ref('')
 
 watch(selectedShipping, (newVal, oldVal) => {
-console.log(selectedShipping.value);
+  console.log(selectedShipping.value);
 })
 
 // import { UserOutlined, DownOutlined } from '@ant-design/icons-vue';
@@ -134,37 +126,39 @@ const handleMenuClick: MenuProps['onClick'] = e => {
 
     <!-- lew-ui 自带一个tag的组件 -->
     <lew-flex direction="x" :gap="10">
-      <lew-checkbox-group v-model="selectedPlatforms" size="small" :options="tagOptions" />
+      <lew-checkbox-group v-model="selectedTags" size="small" :options="tagOptions" />
     </lew-flex>
 
-    <lew-button size="medium" :request="groupbyserverandtag" text="服务器分类" type="ghost" />
+    <h1 class="text-3xl font-bold underline">测试</h1>
+
+    <lew-button class="underline" size="medium" :request="groupbyserverandtag" text="服务器分类" type="ghost" />
     <div>
       <lew-button size="medium" :request="deleteInvalidServer" text="删除服务器" type="ghost" />
     </div>
 
     <div class="demo-dropdown-wrap">
-    <a-dropdown-button @click="handleButtonClick">
-      下拉框
-      <template #overlay>
-        <a-menu @click="handleMenuClick">
-          <a-menu-item key="1">
-            <UserOutlined />
-            1st menu item
-          </a-menu-item>
-          <a-menu-item key="2">
-            <UserOutlined />
-            2nd menu item
-          </a-menu-item>
-          <a-menu-item key="3">
-            <UserOutlined />
-            3rd item
-          </a-menu-item>
-        </a-menu>
-      </template>
-    </a-dropdown-button>
-  
-  
-  </div>
+      <a-dropdown-button @click="handleButtonClick">
+        下拉框
+        <template #overlay>
+          <a-menu @click="handleMenuClick">
+            <a-menu-item key="1">
+              <UserOutlined />
+              1st menu item
+            </a-menu-item>
+            <a-menu-item key="2">
+              <UserOutlined />
+              2nd menu item
+            </a-menu-item>
+            <a-menu-item key="3">
+              <UserOutlined />
+              3rd item
+            </a-menu-item>
+          </a-menu>
+        </template>
+      </a-dropdown-button>
+
+
+    </div>
 
   </div>
 
@@ -174,4 +168,6 @@ const handleMenuClick: MenuProps['onClick'] = e => {
 
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+@import "tailwindcss";
+</style>

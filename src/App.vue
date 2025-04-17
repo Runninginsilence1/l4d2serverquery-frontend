@@ -15,27 +15,22 @@ import TestView from "@/views/TestView.vue";
 <template>
 
 
-  <!-- <TagView /> -->
-   <div class="tag">
-     <TestView />
+  <!-- 标签和一些启动测试用的东西 -->
+  <div class="tag">
+    <TestView />
     <TagView />
-   </div>
-   <div class="table">
+  </div>
+  <!-- 用来展示信息的表格 -->
+  <div class="table">
     <TableView />
-   </div>
-   <div class="add">
+  </div>
+  <!-- 添加服务器的地方 -->
+  <div class="add">
     <AddServerView />
-   </div>
-
-
-  
-
-
-  
+  </div>
 </template>
 
 <style lang="scss" scoped>
-
 .tag {
   // border-style: groove;
   // border-color: greenyellow;
