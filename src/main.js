@@ -12,6 +12,8 @@ import "lew-ui/style";
 // 全局导入
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
+// mock
+// import "@/mockjs"
 
 
 const app = createApp(App)

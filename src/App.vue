@@ -8,14 +8,28 @@ import axios from 'axios';
 import { LewMessage } from 'lew-ui';
 import cc from 'clipboard';
 import TestView from "@/views/TestView.vue";
+import myrequest from './utils/request';
 
+// test mock
+const testMock = () => {
+  myrequest.get('/user/list')
+    .then(res => {
+      console.log("call test mock ok");
+      
+      console.log(res);
+    }
+    )
+    .catch(err => {
+      console.log("call test mock fail");
+      console.error(err);
+    })
+}
+
+testMock()
 
 </script>
 
 <template>
-
-<!--  -->
-
 
   <div class="tag">
     <TestView />
@@ -31,28 +45,18 @@ import TestView from "@/views/TestView.vue";
     <AddServerView />
   </div>
 
-
-  <!-- 标签和一些启动测试用的东西 -->
-  
-  <!-- 添加服务器的地方 -->
-  
 </template>
 
 <style lang="scss" scoped>
 .tag {
-  // border-style: groove;
-  // border-color: greenyellow;
+  // background-color: green;
 }
 
 .table {
-  //margin-top: 10vh;
-  // border-style: groove;
-  // border: aqua 1px solid;
+  // background-color: skyblue;
 }
 
 .add {
-  margin-top: 10vh;
-  // border-style: groove;
-  // border-color: red;
+  // background-color: red;
 }
 </style>

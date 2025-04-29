@@ -129,14 +129,18 @@ const handleMenuClick: MenuProps['onClick'] = e => {
       <lew-checkbox-group v-model="selectedTags" size="small" :options="tagOptions" />
     </lew-flex>
 
-    <h1 class="text-3xl font-bold underline">测试</h1>
+    <!-- <h1 class="text-3xl font-bold underline">测试</h1> -->
 
-    <a-flex gap="middle" vertical>
+    
       <a-flex :gap="15">
       <lew-button class="underline" size="medium" :request="groupbyserverandtag" text="服务器分类" type="ghost" />
       <lew-button size="medium" :request="deleteInvalidServer" text="删除服务器" type="ghost" />
+      <!-- <lew-button size="medium" :request="deleteInvalidServer" text="继续测试" type="ghost" /> -->
+      <!-- <lew-button size="medium" :request="deleteInvalidServer" text="继续测试" type="ghost" /> -->
+      <!-- <lew-button size="medium" :request="deleteInvalidServer" text="继续测试" type="ghost" /> -->
+      <!-- <lew-button size="medium" :request="deleteInvalidServer" text="继续测试" type="ghost" /> -->
     </a-flex>
-    </a-flex>
+    
 
   
 
