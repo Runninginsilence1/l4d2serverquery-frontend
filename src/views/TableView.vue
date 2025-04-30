@@ -27,6 +27,7 @@ let statusDataExample: any = ref([
 
 const playerDialogVisible = ref(false)
 const tagDialogVisible = ref(false)
+const patchServerDialogVisible = ref(false)
 
 const playersData: any = ref([])
 
@@ -61,6 +62,10 @@ const RefreshServerFunc = (id: number) => {
     console.log('访问接口失败');
     console.log(error);
   })
+}
+
+const PatchServerFunc = (id: number) => {
+  playerDialogVisible.value = true;
 }
 
 
@@ -282,6 +287,7 @@ const popokCancel = () => {
           <lew-button size="small" text="复制" type="text" @click.stop="ConnectServerFunc(row.id, row.address)"/>
           <lew-button size="small" text="玩家" type="text" @click.stop="QueryPlayerFunc(row.id, row.address)"/>
           <lew-button size="small" text="刷新" type="text" @click.stop="RefreshServerFunc(row.id)"/>
+          <lew-button size="small" text="修改" type="text" @click.stop="PatchServerFunc(row.id)"/>
           <lew-button size="small" text="删除" type="text" @click.stop="DeleteServerInlineFunc(row.id)"/>
         </lew-flex>
       </template>
