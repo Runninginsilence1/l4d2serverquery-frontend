@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {ref} from 'vue';
-import {LewButton, LewFlex, LewMessage, LewTable} from 'lew-ui'
+import {LewButton, LewFlex, LewInput, LewMessage, LewTable} from 'lew-ui'
 import axios from 'axios';
 import cc from 'clipboard';
 import myrequest from '@/utils/request';
@@ -11,6 +11,8 @@ import TagComponent from '@/components/TagComponent.vue'
 
 // Example data
 // 提醒一句：chrome可以直接复制响应json中的数据成josn， 非常方便
+
+const searchText = ref('')
 
 let statusDataExample: any = ref([
   {
@@ -77,6 +79,7 @@ const queryServerFuncV2 = () => {
   const store = useTagListStore();
 
   myrequest.post('/serverList/v2', {
+    name: searchText.value,
     tags: store.getTagList
   })
       .then(function (response) {
@@ -248,12 +251,14 @@ const popokCancel = () => {
 }
 
 
+
 </script>
 
 <template>
 
   <div class="add-area">
     <lew-button size="medium" :request="queryServerFuncV2" text="查询" type="ghost"/>
+    <lew-input v-model="searchText" placeholder="搜索关键字" />
   </div>
 
   <el-dialog v-model="tagDialogVisible" title="标签管理" width="800">
@@ -263,10 +268,10 @@ const popokCancel = () => {
   <!-- el-dialog位置 -->
   <el-dialog v-model="playerDialogVisible" title="玩家信息" width="800">
     <el-table :data="playersData">
-      <el-table-column property="id" label="ID" width="150"/>
+<!--      <el-table-column property="id" label="ID" width="150"/>-->
       <el-table-column property="name" label="名称" width="200"/>
-      <el-table-column property="score" label="分数" width="200"/>
-      <el-table-column property="seconds" label="游戏时间" width="200"/>
+<!--      <el-table-column property="score" label="分数" width="200"/>-->
+<!--      <el-table-column property="seconds" label="游戏时间" width="200"/>-->
     </el-table>
   </el-dialog>
 

@@ -25,7 +25,7 @@ const testMock = () => {
     })
 }
 
-testMock()
+// testMock()
 
 </script>
 

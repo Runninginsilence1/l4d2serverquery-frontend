@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+﻿<script lang="ts" setup>
 import {ref} from 'vue';
 import myrequest from '@/utils/request';
 import {LewMessage} from "lew-ui";
@@ -6,8 +6,6 @@ import {LewMessage} from "lew-ui";
 // 在对话框里面的内容
 
 // 列这一项需要一个具体的字段类型来表示
-
-
 
 const column = [
   {
@@ -102,8 +100,8 @@ const addButton = (addr: string) => {
 <template>
   <a-flex gap="middle" align="start" vertical>
     <a-flex gap="middle" align="start" horizontal>
-    <a-input v-model:value="serverName" placeholder="请输入服务器名称" @pressEnter="searchButton" />
-    <a-button type="primary" @click="searchButton">搜索</a-button>
+      <a-input v-model:value="serverName" placeholder="请输入服务器名称" @pressEnter="searchButton" />
+      <a-button type="primary" @click="searchButton">搜索</a-button>
       <a-spin :spinning="loading"/>
     </a-flex>
 

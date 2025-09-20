@@ -1,14 +1,12 @@
 <script lang="ts" setup>
 import { ref, watch } from 'vue';
-import { LewButton, LewCheckboxGroup } from 'lew-ui'
+import {LewButton, LewCheckboxGroup, LewInput} from 'lew-ui'
 import axios from 'axios';
 import { LewMessage } from 'lew-ui';
 import cc from 'clipboard';
 import { onMounted } from 'vue'
 import myrequest from '@/utils/request'
 import { useCounterStore, useTagListStore } from '@/stores/counter';
-
-
 
 const selectedTags = ref([])
 // 选中了哪些
@@ -61,7 +59,7 @@ const getAllTags = () => {
     })
 }
 
-
+// test commit
 // 
 const deleteInvalidServer = () => {
   myrequest.get('/debug/cleanServers')
@@ -122,9 +120,6 @@ const handleMenuClick: MenuProps['onClick'] = e => {
 
   <div class="tag">
     标签信息
-    <!-- <lew-button size="small" text="查询标签" type="text" @click.stop="checkBoxValuePrint" /> -->
-
-    <!-- lew-ui 自带一个tag的组件 -->
     <lew-flex direction="x" :gap="10">
       <lew-checkbox-group v-model="selectedTags" size="small" :options="tagOptions" />
     </lew-flex>

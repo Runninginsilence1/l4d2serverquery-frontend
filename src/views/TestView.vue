@@ -56,7 +56,7 @@ const handleOk = (e: MouseEvent) => {
     <a-button type="primary" @click="showModal">自定义服务器</a-button>
 
   </a-flex>
-  <a-modal style="width: auto" class="lew-modal" v-model:open="open" title="Basic Modal" @ok="handleOk">
+  <a-modal style="width: auto" class="lew-modal" v-model:open="open" title="服务器浏览器" @ok="handleOk">
     <FindServerView/>
   </a-modal>
 </template>
