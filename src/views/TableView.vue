@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import {ref} from 'vue';
-import {LewButton, LewFlex, LewInput, LewMessage, LewTable} from 'lew-ui'
+import { ElMessage } from 'element-plus'
+import { Search, CopyDocument, User, Refresh, Delete, Warning, Select } from '@element-plus/icons-vue'
 import axios from 'axios';
 import cc from 'clipboard';
 import myrequest from '@/utils/request';
@@ -41,10 +42,7 @@ const QueryPlayerFunc = (id: number, addr: string) => {
     playersData.value = res.data;
     playerDialogVisible.value = true;
   }).catch(function (error) {
-    LewMessage.error({
-      content: '查询失败! 请查看控制台输出',
-      duration: 3000
-    })
+    ElMessage.error('查询失败! 请查看控制台输出')
     console.error(error.response.data)
   })
 }
@@ -57,10 +55,7 @@ const RefreshServerFunc = (id: number) => {
     res.data.playerRatio = `${res.data.onlinePlayers}/${res.data.maxPlayers}`
     statusDataExample.value[index] = res.data;
   }).catch(function (error) {
-    LewMessage.error({
-      content: '访问接口失败!',
-      duration: 3000
-    })
+    ElMessage.error('访问接口失败!')
     console.log('访问接口失败');
     console.log(error);
   })
@@ -102,17 +97,11 @@ const queryServerFuncV2 = () => {
 
 // msg callback
 const queryMsgSuccess = () => {
-  LewMessage.success({
-    content: '查询成功!',
-    duration: 3000
-  })
+  ElMessage.success('查询成功!')
 }
 
 const queryErrorMessage = () => {
-  LewMessage.error({
-    content: '查询失败! 请查看控制台输出',
-    duration: 3000
-  })
+  ElMessage.error('查询失败! 请查看控制台输出')
 }
 
 
@@ -201,16 +190,10 @@ const ConnectServerFunc = (id: number, addr: string) => {
   cc.copy(`connect ${addr}`)
   myrequest.get(`/lastCopyTimeUpdate/${id}`)
       .then(function () {
-        LewMessage.success({
-          content: '更新服务器时间成功!',
-          duration: 3000
-        })
+        ElMessage.success('连接指令已复制! 更新服务器时间成功!')
       })
       .catch(function (error) {
-        LewMessage.error({
-          content: '更新服务器时间失败!',
-          duration: 3000
-        })
+        ElMessage.error('更新服务器时间失败!')
         console.log('更新服务器时间失败');
         console.log(error);
       })
@@ -233,17 +216,11 @@ const DeleteServerInlineFunc = (id: number) => {
 }
 
 const deleteSuccessMessage = () => {
-  LewMessage.success({
-    content: '删除成功!',
-    duration: 3000
-  })
+  ElMessage.success('删除成功!')
 }
 
 const deleteErrorMessage = () => {
-  LewMessage.error({
-    content: '删除失败!',
-    duration: 3000
-  })
+  ElMessage.error('删除失败!')
 }
 
 
@@ -255,54 +232,164 @@ const popokCancel = () => {
 </script>
 
 <template>
+  <div class="table-view-container">
+    <div class="search-section">
+      <el-input 
+        v-model="searchText" 
+        placeholder="搜索服务器关键字..." 
+        size="large"
+        :prefix-icon="Search"
+        clearable
+        class="search-input"
+      />
+      <el-button 
+        type="primary" 
+        size="large" 
+        @click="queryServerFuncV2"
+        :icon="Search"
+      >
+        查询服务器
+      </el-button>
+    </div>
 
-  <div class="add-area">
-    <lew-button size="medium" :request="queryServerFuncV2" text="查询" type="ghost"/>
-    <lew-input v-model="searchText" placeholder="搜索关键字" />
+    <el-dialog 
+      v-model="tagDialogVisible" 
+      title="🏷️ 标签管理" 
+      width="800"
+      append-to-body
+      destroy-on-close
+    >
+      <TagComponent/>
+    </el-dialog>
+
+    <el-dialog 
+      v-model="playerDialogVisible" 
+      title="👥 玩家信息" 
+      width="800"
+      append-to-body
+      destroy-on-close
+    >
+      <el-table :data="playersData" stripe>
+        <el-table-column property="name" label="玩家名称" min-width="200"/>
+      </el-table>
+    </el-dialog>
+
+    <div class="table-area">
+      <el-table 
+        :data="statusDataExample" 
+        stripe 
+        border
+        style="width: 100%"
+        :header-cell-style="{background: '#f5f7fa', color: '#606266'}"
+      >
+        <el-table-column property="address" label="服务器地址" min-width="180" />
+        <el-table-column property="serverName" label="服务器名称" min-width="200" show-overflow-tooltip />
+        <el-table-column property="map" label="当前地图" min-width="150" />
+        <el-table-column property="playerRatio" label="玩家数量" width="120" align="center" />
+        <el-table-column property="lastQueryTimeString" label="最后复制时间" min-width="180" />
+        
+        <el-table-column label="状态" width="150" align="center">
+          <template #default="{ row }">
+            <el-tag 
+              v-if="statusRender(row.lastQueryTimeString)" 
+              type="warning"
+              effect="dark"
+            >
+              <el-icon style="vertical-align: middle;"><Warning /></el-icon>
+              5分钟内已连
+            </el-tag>
+            <el-tag v-else type="success" effect="dark">
+              <el-icon style="vertical-align: middle;"><Select /></el-icon>
+              推荐连接
+            </el-tag>
+          </template>
+        </el-table-column>
+
+        <el-table-column label="操作" width="320" align="center" fixed="right">
+          <template #default="{ row }">
+            <el-space wrap>
+              <el-button 
+                size="small" 
+                type="primary" 
+                @click.stop="ConnectServerFunc(row.id, row.address)"
+                :icon="CopyDocument"
+              >
+                复制
+              </el-button>
+              <el-button 
+                size="small" 
+                type="info" 
+                @click.stop="QueryPlayerFunc(row.id, row.address)"
+                :icon="User"
+              >
+                玩家
+              </el-button>
+              <el-button 
+                size="small" 
+                type="success" 
+                @click.stop="RefreshServerFunc(row.id)"
+                :icon="Refresh"
+              >
+                刷新
+              </el-button>
+              <el-button 
+                size="small" 
+                type="danger" 
+                @click.stop="DeleteServerInlineFunc(row.id)"
+                :icon="Delete"
+              >
+                删除
+              </el-button>
+            </el-space>
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
   </div>
-
-  <el-dialog v-model="tagDialogVisible" title="标签管理" width="800">
-    <TagComponent/>
-  </el-dialog>
-
-  <!-- el-dialog位置 -->
-  <el-dialog v-model="playerDialogVisible" title="玩家信息" width="800">
-    <el-table :data="playersData">
-<!--      <el-table-column property="id" label="ID" width="150"/>-->
-      <el-table-column property="name" label="名称" width="200"/>
-<!--      <el-table-column property="score" label="分数" width="200"/>-->
-<!--      <el-table-column property="seconds" label="游戏时间" width="200"/>-->
-    </el-table>
-  </el-dialog>
-
-  <div class="table-area" style="height: 680px">
-    <lew-table :data-source="statusDataExample" :columns="statusColumns">
-
-      <template #status="{ row }">
-        <lew-flex gap="0">
-          <!-- 判断是否 -->
-          <lew-tag v-if="statusRender(row.lastQueryTimeString)" type="fill" color="yellow">距离上次连接不足5分钟
-          </lew-tag>
-          <lew-tag v-else type="fill" color="green">推荐连接</lew-tag>
-        </lew-flex>
-      </template>
-
-      <template #action="{ row }">
-        <lew-flex gap="0">
-          <lew-button size="small" text="复制" type="text" @click.stop="ConnectServerFunc(row.id, row.address)"/>
-          <lew-button size="small" text="玩家" type="text" @click.stop="QueryPlayerFunc(row.id, row.address)"/>
-          <lew-button size="small" text="刷新" type="text" @click.stop="RefreshServerFunc(row.id)"/>
-          <lew-button size="small" text="修改" type="text" @click.stop="PatchServerFunc(row.id)"/>
-          <lew-button size="small" text="删除" type="text" @click.stop="DeleteServerInlineFunc(row.id)"/>
-        </lew-flex>
-      </template>
-    </lew-table>
-  </div>
-
 </template>
 
 <style lang="scss" scoped>
+.table-view-container {
+  width: 100%;
+}
+
+.search-section {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+  align-items: center;
+  
+  .search-input {
+    flex: 1;
+    max-width: 500px;
+  }
+}
+
 .table-area {
-  //border: red 5px solid;
+  width: 100%;
+  
+  :deep(.el-table) {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  :deep(.el-table th) {
+    font-weight: 600;
+  }
+  
+  :deep(.el-button + .el-button) {
+    margin-left: 0;
+  }
+}
+
+:deep(.el-dialog) {
+  border-radius: 12px;
+}
+
+:deep(.el-dialog__header) {
+  background: linear-gradient(to right, #f8f9fa, #e9ecef);
+  border-bottom: 2px solid #dee2e6;
+  padding: 16px 20px;
 }
 </style>

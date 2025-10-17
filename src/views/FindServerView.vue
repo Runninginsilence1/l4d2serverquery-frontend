@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import {ref} from 'vue';
 import myrequest from '@/utils/request';
-import {LewMessage} from "lew-ui";
+import { ElMessage } from 'element-plus';
 
 const showSearchHint = ref(true);
 
@@ -75,7 +75,7 @@ const searchButton = () => {
 
         data.value = columnData;
 
-        LewMessage.success("搜索成功")
+        ElMessage.success("搜索成功")
       })
       .catch(function (error) {
         console.error(error)
@@ -88,23 +88,28 @@ const addButton = (addr: string) => {
 
   myrequest.get(`/serverAddByMasterQuery?addr=${addr}`)
       .then(function (res) {
-        LewMessage.success("添加成功")
+        ElMessage.success("添加成功")
       })
       .catch(function (error) {
-        LewMessage.error("添加失败")
+        ElMessage.error("添加失败")
       });
 }
 </script>
 
 <template>
-  <a-flex gap="middle" align="start" vertical>
-    <a-flex gap="middle" align="start" horizontal>
-    <a-input v-model:value="serverName" placeholder="请输入服务器名称" @pressEnter="searchButton" />
-    <a-button type="primary" @click="searchButton">搜索</a-button>
+  <div class="find-server-container">
+    <a-flex gap="middle" align="start" horizontal class="search-bar">
+      <a-input 
+        v-model:value="serverName" 
+        placeholder="请输入服务器名称" 
+        @pressEnter="searchButton"
+        size="large"
+      />
+      <a-button type="primary" @click="searchButton" size="large">搜索</a-button>
       <a-spin :spinning="loading"/>
     </a-flex>
 
-    <div v-if="showSearchHint">
+    <div v-if="showSearchHint" class="hint-container">
       <div class="search-prompt-box">
         <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="11" cy="11" r="8"></circle>
@@ -119,32 +124,47 @@ const addButton = (addr: string) => {
         </div>
       </div>
     </div>
-    <div v-else>
-      <a-table :columns="column" :data-source="data" bordered>
+    
+    <div v-else class="table-container">
+      <a-table 
+        :columns="column" 
+        :data-source="data" 
+        bordered
+        :pagination="{ pageSize: 10, showSizeChanger: true, showTotal: total => `共 ${total} 条` }"
+        :scroll="{ y: 400 }"
+      >
         <template #bodyCell="{ column, record }">
           <template v-if="column.dataIndex === 'status'">
             {{ record.player1 }} / {{ record.player2 }} Players
           </template>
           <template v-if="column.dataIndex === 'action'">
-        <span>
-          <a-button @click="addButton(record.addr)">单独添加</a-button>
-        </span>
+            <a-button type="primary" @click="addButton(record.addr)">单独添加</a-button>
           </template>
         </template>
       </a-table>
     </div>
-  </a-flex>
+  </div>
 </template>
 
 <style lang="css" scoped>
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+.find-server-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.search-bar {
+  width: 100%;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.hint-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  margin: 0;
-  background-color: #f4f7f9;
+  min-height: 300px;
 }
 
 .search-prompt-box {
@@ -152,32 +172,39 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 30px 40px;
-  background-color: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  padding: 40px 50px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
   text-align: center;
-  max-width: 400px;
+  max-width: 450px;
   animation: fadeIn 0.5s ease-in-out;
 }
 
 .icon {
   font-size: 48px;
-  color: #5a7d9b;
+  color: #ffffff;
   margin-bottom: 20px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
 .title {
-  font-size: 24px;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 10px;
+  font-size: 26px;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 12px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .message {
   font-size: 16px;
-  color: #666;
-  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.8;
+}
+
+.table-container {
+  width: 100%;
+  overflow: hidden;
 }
 
 @keyframes fadeIn {
@@ -190,5 +217,4 @@ body {
     transform: translateY(0);
   }
 }
-
 </style>

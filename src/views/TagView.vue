@@ -1,12 +1,13 @@
 <script lang="ts" setup>
 import { ref, watch } from 'vue';
-import {LewButton, LewCheckboxGroup, LewInput} from 'lew-ui'
+import { ElMessage } from 'element-plus'
+import { Setting, Delete as DeleteIcon, Filter, Tools, EditPen } from '@element-plus/icons-vue'
 import axios from 'axios';
-import { LewMessage } from 'lew-ui';
 import cc from 'clipboard';
 import { onMounted } from 'vue'
 import myrequest from '@/utils/request'
 import { useCounterStore, useTagListStore } from '@/stores/counter';
+import TagComponent from '@/components/TagComponent.vue';
 
 const selectedTags = ref([])
 // 选中了哪些
@@ -17,19 +18,17 @@ const tagOptions = ref([
   // { label: '微软', value: 'microsoft' },
 ])
 
+// 标签管理弹窗
+const tagManagerVisible = ref(false)
+const tagComponentRef = ref(null)
+
 // 封装成功和失败的气泡
 const showOkMessage = (message: string) => {
-  LewMessage.success({
-    content: message,
-    duration: 3000
-  })
+  ElMessage.success(message)
 }
 
 const showFailMessage = (message: string) => {
-  LewMessage.error({
-    content: message,
-    duration: 3000
-  })
+  ElMessage.error(message)
 }
 
 watch(selectedTags, (newVal, oldVal) => {
@@ -47,16 +46,23 @@ const getAllTags = () => {
       const tagArray = res.data.map(item => {
         return { label: item.name, value: item.id }
       })
-
       tagOptions.value = tagArray
-
-      showOkMessage('获取标签成功')
     }
     )
     .catch(err => {
       showFailMessage('获取标签失败')
       console.log(err)
     })
+}
+
+// 打开标签管理弹窗
+const openTagManager = () => {
+  tagManagerVisible.value = true
+}
+
+// 关闭标签管理弹窗时刷新标签列表
+const handleTagManagerClose = () => {
+  getAllTags() // 刷新筛选区的标签列表
 }
 
 // test commit
@@ -75,7 +81,7 @@ const deleteInvalidServer = () => {
 
 // 更新关系
 const groupbyserverandtag = () => {
-  myrequest.get('/debug/groupByTag')
+  myrequest.get('/groupByTag')
     .then(res => {
       showOkMessage('更新成功')
     }
@@ -117,36 +123,165 @@ const handleMenuClick: MenuProps['onClick'] = e => {
 </script>
 
 <template>
-
-  <div class="tag">
-    标签信息
-    <lew-flex direction="x" :gap="10">
-      <lew-checkbox-group v-model="selectedTags" size="small" :options="tagOptions" />
-    </lew-flex>
-
-    <!-- <h1 class="text-3xl font-bold underline">测试</h1> -->
-
+  <div class="tag-view-container">
+    <div class="tag-section">
+      <div class="section-header">
+        <h3 class="section-title">
+          <el-icon><Filter /></el-icon>
+          标签筛选
+        </h3>
+        <el-button 
+          type="primary" 
+          :icon="EditPen"
+          @click="openTagManager"
+          size="default"
+        >
+          标签管理
+        </el-button>
+      </div>
+      
+      <div v-if="tagOptions.length === 0" class="empty-state">
+        <el-empty 
+          description="暂无标签"
+          :image-size="80"
+        >
+          <template #description>
+            <div class="empty-description">
+              <p class="empty-title">暂无可用标签</p>
+              <p class="empty-message">点击右上角"标签管理"按钮添加标签，或点击下方"服务器分类"按钮自动创建标签</p>
+            </div>
+          </template>
+        </el-empty>
+      </div>
+      
+      <el-checkbox-group v-else v-model="selectedTags" size="large">
+        <el-checkbox 
+          v-for="option in tagOptions" 
+          :key="option.value" 
+          :label="option.value"
+          border
+        >
+          {{ option.label }}
+        </el-checkbox>
+      </el-checkbox-group>
+    </div>
     
-      <a-flex :gap="15">
-      <lew-button class="underline" size="medium" :request="groupbyserverandtag" text="服务器分类" type="ghost" />
-      <lew-button size="medium" :request="deleteInvalidServer" text="删除服务器" type="ghost" />
-      <!-- <lew-button size="medium" :request="deleteInvalidServer" text="继续测试" type="ghost" /> -->
-      <!-- <lew-button size="medium" :request="deleteInvalidServer" text="继续测试" type="ghost" /> -->
-      <!-- <lew-button size="medium" :request="deleteInvalidServer" text="继续测试" type="ghost" /> -->
-      <!-- <lew-button size="medium" :request="deleteInvalidServer" text="继续测试" type="ghost" /> -->
-    </a-flex>
-    
+    <!-- 标签管理弹窗 -->
+    <el-dialog
+      v-model="tagManagerVisible"
+      title="🏷️ 标签管理"
+      width="800px"
+      append-to-body
+      destroy-on-close
+      @close="handleTagManagerClose"
+    >
+      <TagComponent ref="tagComponentRef" />
+    </el-dialog>
 
-  
+    <el-divider />
 
+    <div class="action-section">
+      <h3 class="section-title">
+        <el-icon><Tools /></el-icon>
+        管理操作
+      </h3>
+      <el-space wrap :size="12">
+        <el-button 
+          type="primary" 
+          @click="groupbyserverandtag"
+          :icon="Setting"
+        >
+          服务器分类
+        </el-button>
+        <el-button 
+          type="danger" 
+          @click="deleteInvalidServer"
+          :icon="DeleteIcon"
+        >
+          清理无效服务器
+        </el-button>
+      </el-space>
+    </div>
   </div>
-
-
-  <!-- ------------------ -->
-
-
 </template>
 
 <style lang="scss" scoped>
-@import "tailwindcss";
+.tag-view-container {
+  width: 100%;
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #303133;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  
+  .el-icon {
+    font-size: 18px;
+  }
+}
+
+.tag-section {
+  margin-bottom: 20px;
+  
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  
+  .empty-state {
+    padding: 20px 0;
+    
+    .empty-description {
+      .empty-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #606266;
+        margin-bottom: 8px;
+      }
+      
+      .empty-message {
+        font-size: 14px;
+        color: #909399;
+        line-height: 1.6;
+        max-width: 450px;
+        margin: 0 auto;
+      }
+    }
+  }
+  
+  :deep(.el-checkbox-group) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  
+  :deep(.el-checkbox.is-bordered) {
+    margin-right: 0;
+    padding: 10px 20px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+  }
+}
+
+.action-section {
+  :deep(.el-button) {
+    transition: all 0.3s ease;
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+  }
+}
 </style>

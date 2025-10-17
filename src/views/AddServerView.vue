@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
-import { LewButton } from 'lew-ui'
+import { ElMessage } from 'element-plus'
+import { Plus, Connection } from '@element-plus/icons-vue'
 import axios from 'axios';
-import { LewMessage } from 'lew-ui';
 import cc from 'clipboard';
 import myrequest from '@/utils/request';
 
@@ -59,31 +59,19 @@ const queryServerFunc = () => {
 
 // msg callback
 const queryMsgSuccess = () => {
-  LewMessage.success({
-    content: '查询成功!',
-    duration: 3000
-  })
+  ElMessage.success('查询成功!')
 }
 
 const queryErrorMessage = () => {
-  LewMessage.error({
-    content: '查询失败! 请查看控制台输出',
-    duration: 3000
-  })
+  ElMessage.error('查询失败! 请查看控制台输出')
 }
 
 const showSuccessMessage = () => {
-  LewMessage.success({
-    content: '添加成功!',
-    duration: 3000
-  })
+  ElMessage.success('添加成功!')
 }
 
 const showErrorMessage = () => {
-  LewMessage.error({
-    content: '添加失败!',
-    duration: 3000
-  })
+  ElMessage.error('添加失败!')
 }
 
 const statusColumns = [
@@ -138,17 +126,11 @@ const DeleteServerInlineFunc = (id: number) => {
 }
 
 const deleteSuccessMessage = () => {
-  LewMessage.success({
-    content: '删除成功!',
-    duration: 3000
-  })
+  ElMessage.success('删除成功!')
 }
 
 const deleteErrorMessage = () => {
-  LewMessage.error({
-    content: '删除失败!',
-    duration: 3000
-  })
+  ElMessage.error('删除失败!')
 }
 
 // add
@@ -156,10 +138,7 @@ let newAddress = ref('')
 let addDesc = ref('默认服务器描述')
 
 const DuplicateErrorMessage = (id: number) => {
-  LewMessage.error({
-    content: '服务器信息重复!',
-    duration: 3000
-  })
+  ElMessage.error('服务器信息重复!')
 }
 
 const addServerFunc = () => {
@@ -221,16 +200,53 @@ watch(fileList, (newVal, oldVal) => {
 </script>
 
 <template>
-
-<div class="op-area">
-    <lew-input v-model="newAddress" size="medium" placeholder="输入要添加的服务器地址" clearable />
-    <lew-button size="medium" :request="addServerFunc" text="添加服务器!" type="ghost" />
-    
+  <div class="add-server-container">
+    <div class="input-group">
+      <el-input 
+        v-model="newAddress" 
+        size="large" 
+        placeholder="输入服务器地址 (例如: 192.168.1.1:27015)" 
+        clearable
+        class="server-input"
+      >
+        <template #prefix>
+          <el-icon><Connection /></el-icon>
+        </template>
+      </el-input>
+      <el-button 
+        size="large" 
+        type="primary" 
+        @click="addServerFunc"
+        :icon="Plus"
+        class="add-button"
+      >
+        添加服务器
+      </el-button>
+    </div>
   </div>
-
 </template>
 
 <style lang="scss" scoped>
+.add-server-container {
+  width: 100%;
+}
+
+.input-group {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  width: 100%;
+  
+  .server-input {
+    flex: 3; // 输入框占3份
+  }
+  
+  .add-button {
+    flex-shrink: 0; // 按钮不缩小
+    min-width: 140px;
+  }
+}
+
 .info {
   line-height: 22px;
 
@@ -244,7 +260,7 @@ watch(fileList, (newVal, oldVal) => {
     text-overflow: ellipsis;
     font-size: 12px;
     white-space: nowrap;
-    color: var(--lew-text-color-7);
+    color: #999;
   }
 }
 </style>
