@@ -208,6 +208,18 @@ const DeleteServerInlineFunc = (id: number) => {
           // 处理成功情况
           // statusDataExample.value = response.data;
           deleteSuccessMessage()
+
+          // 体现一种及时刷新的效果
+          // id不一定是index, 这一点ai很快就帮我指正出来了
+
+
+          
+          let index = statusDataExample.value.findIndex((item) => item.id == id)
+
+          if (index !== -1) {
+statusDataExample.value.splice(index, 1);
+          }
+
         })
         .catch(function () {
           deleteErrorMessage()
