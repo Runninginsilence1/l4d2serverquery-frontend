@@ -329,6 +329,6 @@ git commit -m "refactor: 重构代码"
 
 **⭐ 如果这个项目对你有帮助，欢迎 Star ⭐**
 
-Made with ❤️ by [Your Name]
+Made with ❤️ by [claude-4.5-sonnet]. Thank you!
 
 </div>

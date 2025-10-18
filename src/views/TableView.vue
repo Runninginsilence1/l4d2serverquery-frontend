@@ -1,19 +1,22 @@
 <script lang="ts" setup>
 import {ref} from 'vue';
 import { ElMessage } from 'element-plus'
-import { Search, CopyDocument, User, Refresh, Delete, Warning, Select } from '@element-plus/icons-vue'
+import { Search, CopyDocument, User, Refresh, Delete, Warning, Select, PriceTag } from '@element-plus/icons-vue'
 import axios from 'axios';
 import cc from 'clipboard';
 import myrequest from '@/utils/request';
 import {useTagListStore} from '@/stores/counter';
 import {ElDialog} from "element-plus";
 import TagComponent from '@/components/TagComponent.vue'
+import { getAllTags, bindTagsToServer, getServerTags } from '@/api/tag'
 
 
 // Example data
 // 提醒一句：chrome可以直接复制响应json中的数据成josn， 非常方便
 
 const searchText = ref('')
+const minPlayers = ref(0)
+const maxPlayers = ref(0)
 
 let statusDataExample: any = ref([
   {
@@ -31,8 +34,13 @@ let statusDataExample: any = ref([
 const playerDialogVisible = ref(false)
 const tagDialogVisible = ref(false)
 const patchServerDialogVisible = ref(false)
+const bindTagDialogVisible = ref(false)
 
 const playersData: any = ref([])
+const allTags: any = ref([])
+const selectedTags: any = ref([])
+const currentServerId = ref(0)
+const currentServerName = ref('')
 
 
 const QueryPlayerFunc = (id: number, addr: string) => {
@@ -66,17 +74,28 @@ const PatchServerFunc = (id: number) => {
 }
 
 
-// 带上了 tag
+// 带上了 tag 和玩家数量过滤
 const queryServerFuncV2 = () => {
   // 向给定ID的用户发起请求
   // instance.get('/serverList')
 
   const store = useTagListStore();
 
-  myrequest.post('/serverList/v2', {
+  // 构建请求参数
+  const params: any = {
     name: searchText.value,
     tags: store.getTagList
-  })
+  }
+  
+  // 只有当值大于0时才添加玩家数量过滤参数
+  if (minPlayers.value > 0) {
+    params.minPlayers = minPlayers.value
+  }
+  if (maxPlayers.value > 0) {
+    params.maxPlayers = maxPlayers.value
+  }
+
+  myrequest.post('/serverList/v2', params)
       .then(function (response) {
         // console.log('成功获取服务器列表数据', response.data);
 
@@ -239,6 +258,50 @@ const deleteErrorMessage = () => {
 const popokCancel = () => {
 }
 
+// 打开绑定标签对话框
+const openBindTagDialog = async (id: number, serverName: string) => {
+  currentServerId.value = id
+  currentServerName.value = serverName
+  
+  try {
+    // 获取所有标签
+    const tagsRes = await getAllTags()
+    allTags.value = tagsRes.data
+    
+    // 获取服务器已绑定的标签
+    const serverTagsRes = await getServerTags(id)
+    selectedTags.value = serverTagsRes.data.map((tag: any) => tag.id)
+    
+    bindTagDialogVisible.value = true
+  } catch (error) {
+    ElMessage.error('获取标签信息失败')
+    console.error(error)
+  }
+}
+
+// 保存标签绑定
+const saveTagBinding = async () => {
+  try {
+    await bindTagsToServer(currentServerId.value, selectedTags.value)
+    ElMessage.success('标签绑定成功')
+    bindTagDialogVisible.value = false
+    
+    // 刷新服务器列表以显示更新后的标签
+    queryServerFuncV2()
+  } catch (error) {
+    ElMessage.error('标签绑定失败')
+    console.error(error)
+  }
+}
+
+// 重置筛选条件
+const resetFilters = () => {
+  searchText.value = ''
+  minPlayers.value = 0
+  maxPlayers.value = 0
+  ElMessage.info('已重置筛选条件')
+}
+
 
 
 </script>
@@ -254,6 +317,30 @@ const popokCancel = () => {
         clearable
         class="search-input"
       />
+      
+      <div class="player-filter">
+        <span class="filter-label">在线玩家数：</span>
+        <el-input-number 
+          v-model="minPlayers" 
+          :min="0" 
+          :max="32"
+          size="large"
+          placeholder="最小"
+          class="player-input"
+          controls-position="right"
+        />
+        <span class="filter-separator">-</span>
+        <el-input-number 
+          v-model="maxPlayers" 
+          :min="0" 
+          :max="32"
+          size="large"
+          placeholder="最大"
+          class="player-input"
+          controls-position="right"
+        />
+      </div>
+      
       <el-button 
         type="primary" 
         size="large" 
@@ -261,6 +348,15 @@ const popokCancel = () => {
         :icon="Search"
       >
         查询服务器
+      </el-button>
+      
+      <el-button 
+        type="info" 
+        size="large" 
+        @click="resetFilters"
+        plain
+      >
+        重置
       </el-button>
     </div>
 
@@ -286,6 +382,50 @@ const popokCancel = () => {
       </el-table>
     </el-dialog>
 
+    <el-dialog 
+      v-model="bindTagDialogVisible" 
+      :title="`🏷️ 绑定标签 - ${currentServerName}`" 
+      width="600"
+      append-to-body
+      destroy-on-close
+    >
+      <div class="bind-tag-content">
+        <el-alert
+          title="提示"
+          description="选择要绑定到此服务器的标签，可以多选"
+          type="info"
+          :closable="false"
+          style="margin-bottom: 20px;"
+        />
+        
+        <el-checkbox-group v-model="selectedTags" class="tag-checkbox-group">
+          <el-checkbox 
+            v-for="tag in allTags" 
+            :key="tag.id" 
+            :label="tag.id"
+            :value="tag.id"
+            border
+            size="large"
+          >
+            {{ tag.name }}
+          </el-checkbox>
+        </el-checkbox-group>
+        
+        <el-empty 
+          v-if="allTags.length === 0" 
+          description="暂无可用标签，请先创建标签"
+          :image-size="100"
+        />
+      </div>
+      
+      <template #footer>
+        <el-button @click="bindTagDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="saveTagBinding" :icon="PriceTag">
+          保存绑定
+        </el-button>
+      </template>
+    </el-dialog>
+
     <div class="table-area">
       <el-table 
         :data="statusDataExample" 
@@ -298,6 +438,23 @@ const popokCancel = () => {
         <el-table-column property="serverName" label="服务器名称" min-width="200" show-overflow-tooltip />
         <el-table-column property="map" label="当前地图" min-width="150" />
         <el-table-column property="playerRatio" label="玩家数量" width="120" align="center" />
+        
+        <el-table-column label="标签" min-width="200">
+          <template #default="{ row }">
+            <div v-if="row.tags && row.tags.length > 0" class="tags-cell">
+              <el-tag 
+                v-for="tag in row.tags" 
+                :key="tag.id"
+                size="small"
+                effect="plain"
+                style="margin-right: 5px;"
+              >
+                {{ tag.name }}
+              </el-tag>
+            </div>
+            <span v-else style="color: #909399;">暂无标签</span>
+          </template>
+        </el-table-column>
         <el-table-column property="lastQueryTimeString" label="最后复制时间" min-width="180" />
         
         <el-table-column label="状态" width="150" align="center">
@@ -317,7 +474,7 @@ const popokCancel = () => {
           </template>
         </el-table-column>
 
-        <el-table-column label="操作" width="320" align="center" fixed="right">
+        <el-table-column label="操作" width="400" align="center" fixed="right">
           <template #default="{ row }">
             <el-space wrap>
               <el-button 
@@ -335,6 +492,14 @@ const popokCancel = () => {
                 :icon="User"
               >
                 玩家
+              </el-button>
+              <el-button 
+                size="small" 
+                type="warning" 
+                @click.stop="openBindTagDialog(row.id, row.serverName)"
+                :icon="PriceTag"
+              >
+                标签
               </el-button>
               <el-button 
                 size="small" 
@@ -370,10 +535,34 @@ const popokCancel = () => {
   gap: 16px;
   margin-bottom: 20px;
   align-items: center;
+  flex-wrap: wrap;
   
   .search-input {
     flex: 1;
+    min-width: 300px;
     max-width: 500px;
+  }
+  
+  .player-filter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    
+    .filter-label {
+      font-size: 14px;
+      color: #606266;
+      white-space: nowrap;
+    }
+    
+    .filter-separator {
+      font-size: 16px;
+      color: #909399;
+      font-weight: 500;
+    }
+    
+    .player-input {
+      width: 120px;
+    }
   }
 }
 
@@ -403,5 +592,27 @@ const popokCancel = () => {
   background: linear-gradient(to right, #f8f9fa, #e9ecef);
   border-bottom: 2px solid #dee2e6;
   padding: 16px 20px;
+}
+
+.bind-tag-content {
+  min-height: 200px;
+  
+  .tag-checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    
+    :deep(.el-checkbox) {
+      margin: 0;
+      padding: 10px 20px;
+      width: 100%;
+    }
+  }
+}
+
+.tags-cell {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
 }
 </style>
