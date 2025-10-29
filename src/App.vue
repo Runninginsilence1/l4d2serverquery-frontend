@@ -33,7 +33,7 @@ const testMock = () => {
     <div class="header-section">
       <h1 class="app-title">
         <el-icon style="vertical-align: middle; margin-right: 8px;"><Connection /></el-icon>
-        L4D2 服务器管理系统
+        L4D2 服务器查询系统
       </h1>
     </div>
 

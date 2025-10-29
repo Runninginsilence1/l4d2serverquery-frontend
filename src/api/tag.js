@@ -39,3 +39,4 @@ export const unbindTagFromServer = (serverId, tagId) => {
   return myrequest.delete(`/server/${serverId}/tags/${tagId}`)
 }
 
+

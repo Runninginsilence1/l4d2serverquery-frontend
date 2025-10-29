@@ -17,17 +17,19 @@ import { getAllTags, bindTagsToServer, getServerTags } from '@/api/tag'
 const searchText = ref('')
 const minPlayers = ref(0)
 const maxPlayers = ref(0)
+const useLocalSearch = ref(false) // 是否使用本地搜索
+const originalServerList: any = ref([]) // 保存原始服务器列表，用于本地搜索
 
 let statusDataExample: any = ref([
-  {
-    "id": 24,
-    "address": "106.54.61.52:25444",
-    "serverName": "Fake Data",
-    "map": "c8m5_rooftop",
-    "onlinePlayers": 8,
-    "maxPlayers": 12,
-    "lastQueryTimeString": "2024-11-17 15:58:27"
-  }
+  // {
+  //   "id": 24,
+  //   "address": "106.54.61.52:25444",
+  //   "serverName": "Fake Data",
+  //   "map": "c8m5_rooftop",
+  //   "onlinePlayers": 8,
+  //   "maxPlayers": 12,
+  //   "lastQueryTimeString": "2024-11-17 15:58:27"
+  // }
 ])
 
 
@@ -74,8 +76,45 @@ const PatchServerFunc = (id: number) => {
 }
 
 
+// 本地搜索函数
+const localSearchFunc = () => {
+  if (originalServerList.value.length === 0) {
+    ElMessage.warning('请先进行后端查询以获取数据')
+    return
+  }
+  
+  // 在原始列表中进行过滤
+  let filteredList = [...originalServerList.value]
+  
+  // 按服务器名称过滤
+  if (searchText.value.trim()) {
+    const keyword = searchText.value.toLowerCase()
+    filteredList = filteredList.filter(server => 
+      server.serverName?.toLowerCase().includes(keyword) || 
+      server.address?.toLowerCase().includes(keyword)
+    )
+  }
+  
+  // 按玩家数量过滤
+  if (minPlayers.value > 0) {
+    filteredList = filteredList.filter(server => server.onlinePlayers >= minPlayers.value)
+  }
+  if (maxPlayers.value > 0) {
+    filteredList = filteredList.filter(server => server.onlinePlayers <= maxPlayers.value)
+  }
+  
+  statusDataExample.value = filteredList
+  ElMessage.success(`本地搜索完成，找到 ${filteredList.length} 个服务器`)
+}
+
 // 带上了 tag 和玩家数量过滤
 const queryServerFuncV2 = () => {
+  // 如果勾选了本地搜索，则执行本地过滤
+  if (useLocalSearch.value) {
+    localSearchFunc()
+    return
+  }
+  
   // 向给定ID的用户发起请求
   // instance.get('/serverList')
 
@@ -99,10 +138,14 @@ const queryServerFuncV2 = () => {
       .then(function (response) {
         // console.log('成功获取服务器列表数据', response.data);
 
-        statusDataExample.value = response.data.map(server => ({
+        const processedData = response.data.map(server => ({
           ...server,
           playerRatio: `${server.onlinePlayers}/${server.maxPlayers}`
         }))
+        
+        statusDataExample.value = processedData
+        // 保存原始数据用于本地搜索
+        originalServerList.value = processedData
         queryMsgSuccess()
 
       })
@@ -299,6 +342,11 @@ const resetFilters = () => {
   searchText.value = ''
   minPlayers.value = 0
   maxPlayers.value = 0
+  useLocalSearch.value = false
+  // 恢复原始列表
+  if (originalServerList.value.length > 0) {
+    statusDataExample.value = [...originalServerList.value]
+  }
   ElMessage.info('已重置筛选条件')
 }
 
@@ -341,13 +389,21 @@ const resetFilters = () => {
         />
       </div>
       
+      <el-checkbox 
+        v-model="useLocalSearch" 
+        size="large"
+        class="local-search-checkbox"
+      >
+        本地搜索
+      </el-checkbox>
+      
       <el-button 
         type="primary" 
         size="large" 
         @click="queryServerFuncV2"
         :icon="Search"
       >
-        查询服务器
+        {{ useLocalSearch ? '搜索' : '查询服务器' }}
       </el-button>
       
       <el-button 
@@ -562,6 +618,13 @@ const resetFilters = () => {
     
     .player-input {
       width: 120px;
+    }
+  }
+  
+  .local-search-checkbox {
+    :deep(.el-checkbox__label) {
+      font-size: 14px;
+      color: #606266;
     }
   }
 }
