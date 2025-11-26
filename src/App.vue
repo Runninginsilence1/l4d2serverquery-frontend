@@ -82,8 +82,10 @@ const testMock = () => {
 <style lang="scss" scoped>
 .app-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); REMOVED for retro theme */
   padding: 20px;
+  position: relative;
+  z-index: 1;
 }
 
 .header-section {
@@ -91,12 +93,15 @@ const testMock = () => {
   margin-bottom: 30px;
   
   .app-title {
-    color: white;
-    font-size: 32px;
+    color: var(--retro-text-main); /* Updated color */
+    font-family: var(--retro-font-tech); /* Updated font */
+    font-size: 42px; /* Larger for retro feel */
     font-weight: 700;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    text-shadow: var(--retro-glow); /* Added glow */
     margin: 0;
     padding: 20px 0;
+    text-transform: uppercase;
+    letter-spacing: 4px;
   }
 }
 
@@ -109,22 +114,15 @@ const testMock = () => {
 }
 
 .section-card {
-  border-radius: 12px;
+  /* Styles moved to global overrides in retro.css for consistency */
   transition: all 0.3s ease;
   
   &:hover {
     transform: translateY(-2px);
+    box-shadow: 0 0 15px rgba(255, 176, 0, 0.3) !important;
   }
   
-  :deep(.el-card__header) {
-    background: linear-gradient(to right, #f8f9fa, #e9ecef);
-    border-bottom: 2px solid #dee2e6;
-    padding: 16px 20px;
-  }
-  
-  :deep(.el-card__body) {
-    padding: 24px;
-  }
+  /* Removed deep selectors that conflict with retro.css */
 }
 
 .card-header {
@@ -132,29 +130,27 @@ const testMock = () => {
   align-items: center;
   
   .card-title {
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 600;
-    color: #495057;
+    color: var(--retro-text-main);
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
+    font-family: var(--retro-font-tech);
+    text-transform: uppercase;
     
     .el-icon {
-      font-size: 20px;
+      font-size: 24px;
+      color: var(--retro-primary);
     }
   }
 }
 
-.tag-section {
-  background: white;
-}
-
-.add-section {
-  background: white;
-}
-
+/* Removed specific section background colors to let global card styles take over */
+.tag-section,
+.add-section,
 .table-section {
-  background: white;
+  background: transparent;
 }
 
 @media (max-width: 768px) {
@@ -163,11 +159,9 @@ const testMock = () => {
   }
   
   .header-section .app-title {
-    font-size: 24px;
+    font-size: 28px;
   }
   
-  .section-card :deep(.el-card__body) {
-    padding: 16px;
-  }
+  /* Removed padding override as it might conflict with global styles, can re-add if needed */
 }
 </style>

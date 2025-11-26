@@ -488,7 +488,7 @@ const resetFilters = () => {
         stripe 
         border
         style="width: 100%"
-        :header-cell-style="{background: '#f5f7fa', color: '#606266'}"
+        :header-cell-style="{}"
       >
         <el-table-column property="address" label="服务器地址" min-width="180" />
         <el-table-column property="serverName" label="服务器名称" min-width="200" show-overflow-tooltip />
@@ -633,9 +633,9 @@ const resetFilters = () => {
   width: 100%;
   
   :deep(.el-table) {
-    border-radius: 8px;
+    /* border-radius: 8px; REMOVED for retro theme */
     overflow: hidden;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+    /* box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1); REMOVED for retro theme */
   }
   
   :deep(.el-table th) {
@@ -652,8 +652,8 @@ const resetFilters = () => {
 }
 
 :deep(.el-dialog__header) {
-  background: linear-gradient(to right, #f8f9fa, #e9ecef);
-  border-bottom: 2px solid #dee2e6;
+  /* background: linear-gradient(to right, #f8f9fa, #e9ecef); REMOVED for retro theme */
+  /* border-bottom: 2px solid #dee2e6; REMOVED for retro theme */
   padding: 16px 20px;
 }
 

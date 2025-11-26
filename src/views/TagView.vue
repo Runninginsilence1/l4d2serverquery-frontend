@@ -213,7 +213,7 @@ const handleMenuClick: MenuProps['onClick'] = e => {
 .section-title {
   font-size: 16px;
   font-weight: 600;
-  color: #303133;
+  color: var(--retro-text-main); /* Updated color */
   margin-bottom: 16px;
   display: flex;
   align-items: center;
@@ -241,13 +241,13 @@ const handleMenuClick: MenuProps['onClick'] = e => {
       .empty-title {
         font-size: 16px;
         font-weight: 600;
-        color: #606266;
+        color: var(--retro-text-main); /* Updated color */
         margin-bottom: 8px;
       }
       
       .empty-message {
         font-size: 14px;
-        color: #909399;
+        color: var(--retro-text-dim); /* Updated color */
         line-height: 1.6;
         max-width: 450px;
         margin: 0 auto;
@@ -269,7 +269,7 @@ const handleMenuClick: MenuProps['onClick'] = e => {
     
     &:hover {
       transform: translateY(-2px);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      /* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); REMOVED for retro theme */
     }
   }
 }
@@ -280,7 +280,7 @@ const handleMenuClick: MenuProps['onClick'] = e => {
     
     &:hover {
       transform: translateY(-2px);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      /* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); REMOVED for retro theme */
     }
   }
 }

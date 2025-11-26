@@ -1,0 +1,234 @@
+/* Cassette Futurism / Retro Terminal Theme */
+
+@import url('https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap');
+
+:root {
+  /* Color Palette */
+  --retro-bg-color: #111111;
+  --retro-bg-dark: #0a0a0a;
+  --retro-primary: #ffb000; /* Amber */
+  --retro-secondary: #ff3333; /* Red for errors/accents */
+  --retro-accent: #33ff00; /* Green for success/terminal */
+  --retro-text-main: #ffb000;
+  --retro-text-dim: rgba(255, 176, 0, 0.7);
+  --retro-border: #ffb000;
+  
+  /* Fonts */
+  --retro-font-main: 'VT323', monospace;
+  --retro-font-tech: 'Share Tech Mono', monospace;
+  
+  /* Effects */
+  --retro-glow: 0 0 10px rgba(255, 176, 0, 0.5), 0 0 20px rgba(255, 176, 0, 0.3);
+  --retro-crt-scanline: rgba(18, 16, 16, 0.1);
+}
+
+body {
+  background-color: var(--retro-bg-color);
+  color: var(--retro-text-main);
+  font-family: var(--retro-font-main);
+  margin: 0;
+  overflow-x: hidden;
+}
+
+/* CRT Overlay Effect */
+body::before {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(18, 16, 16, 0) 50%,
+    rgba(0, 0, 0, 0.25) 50%
+  );
+  background-size: 100% 4px;
+  z-index: 9999;
+  pointer-events: none;
+  animation: scanlines 10s linear infinite;
+}
+
+body::after {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: rgba(18, 16, 16, 0.1);
+  opacity: 0;
+  z-index: 9999;
+  pointer-events: none;
+  animation: flicker 0.15s infinite;
+}
+
+@keyframes scanlines {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 100%; }
+}
+
+@keyframes flicker {
+  0% { opacity: 0.02; }
+  50% { opacity: 0.05; }
+  100% { opacity: 0.02; }
+}
+
+/* Typography Overrides */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--retro-font-tech);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: var(--retro-glow);
+}
+
+/* Element Plus Overrides */
+
+/* Card */
+.el-card {
+  background-color: var(--retro-bg-dark) !important;
+  border: 2px solid var(--retro-border) !important;
+  border-radius: 0 !important;
+  color: var(--retro-text-main) !important;
+  box-shadow: 4px 4px 0px rgba(255, 176, 0, 0.2) !important;
+}
+
+.el-card__header {
+  border-bottom: 2px solid var(--retro-border) !important;
+  background-color: rgba(255, 176, 0, 0.1) !important;
+  font-family: var(--retro-font-tech);
+  text-transform: uppercase;
+}
+
+.el-card__body {
+  background-color: var(--retro-bg-dark) !important;
+}
+
+/* Button */
+.el-button {
+  background-color: transparent !important;
+  border: 2px solid var(--retro-border) !important;
+  color: var(--retro-text-main) !important;
+  border-radius: 0 !important;
+  font-family: var(--retro-font-tech) !important;
+  text-transform: uppercase;
+  transition: all 0.1s !important;
+}
+
+.el-button:hover, .el-button:focus {
+  background-color: var(--retro-primary) !important;
+  color: var(--retro-bg-color) !important;
+  box-shadow: 0 0 15px var(--retro-primary) !important;
+}
+
+.el-button--primary {
+  --el-button-bg-color: transparent;
+  --el-button-border-color: var(--retro-border);
+  --el-button-text-color: var(--retro-text-main);
+}
+
+/* Input */
+.el-input__wrapper {
+  background-color: var(--retro-bg-dark) !important;
+  border: 1px solid var(--retro-border) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.el-input__inner {
+  color: var(--retro-text-main) !important;
+  font-family: var(--retro-font-main) !important;
+  font-size: 1.2rem !important;
+}
+
+.el-input__inner::placeholder {
+  color: var(--retro-text-dim) !important;
+}
+
+.el-input__wrapper.is-focus {
+  box-shadow: 0 0 10px var(--retro-primary) !important;
+}
+
+/* Table */
+.el-table {
+  --el-table-bg-color: transparent !important;
+  --el-table-tr-bg-color: transparent !important;
+  --el-table-header-bg-color: rgba(255, 176, 0, 0.1) !important;
+  --el-table-row-hover-bg-color: rgba(255, 176, 0, 0.2) !important;
+  --el-table-border-color: var(--retro-border) !important;
+  --el-table-text-color: var(--retro-text-main) !important;
+  --el-table-header-text-color: var(--retro-text-main) !important;
+  background-color: transparent !important;
+  font-family: var(--retro-font-main) !important;
+  font-size: 1.1rem !important;
+}
+
+.el-table th.el-table__cell {
+  background-color: rgba(255, 176, 0, 0.1) !important;
+  font-family: var(--retro-font-tech) !important;
+  text-transform: uppercase;
+  border-bottom: 2px solid var(--retro-border) !important;
+}
+
+.el-table td.el-table__cell {
+  border-bottom: 1px solid rgba(255, 176, 0, 0.3) !important;
+}
+
+/* Tag */
+.el-tag {
+  background-color: transparent !important;
+  border: 1px solid currentColor !important;
+  border-radius: 0 !important;
+  font-family: var(--retro-font-tech) !important;
+}
+
+.el-tag--success {
+  color: var(--retro-accent) !important;
+}
+
+.el-tag--warning {
+  color: var(--retro-primary) !important;
+}
+
+.el-tag--danger {
+  color: var(--retro-secondary) !important;
+}
+
+/* Dialog/Modal */
+.el-dialog {
+  background-color: var(--retro-bg-dark) !important;
+  border: 2px solid var(--retro-border) !important;
+  border-radius: 0 !important;
+}
+
+.el-dialog__title {
+  color: var(--retro-text-main) !important;
+  font-family: var(--retro-font-tech) !important;
+}
+
+.el-dialog__body {
+  color: var(--retro-text-main) !important;
+}
+
+/* Divider */
+.el-divider {
+  border-color: var(--retro-border) !important;
+  opacity: 0.5;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 12px;
+  background: var(--retro-bg-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--retro-border);
+  border: 2px solid var(--retro-bg-dark);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--retro-primary);
+}
